@@ -17,11 +17,28 @@ type DataFile = {
   source?: string;
   datasetType?: string;
   isFallback?: boolean;
+  expectedCountryCount?: number;
+  oecdCountryCount?: number;
+  sampleBackedCountryCount?: number;
+  missingOecdCountries?: string[];
+  hasIncompleteOecdPull?: boolean;
 };
 
 type LoadedDataFile = DataFile & {
   data: KCollusionIndex[];
 };
+
+type RefreshMetadata = Pick<
+  DataFile,
+  | "source"
+  | "datasetType"
+  | "isFallback"
+  | "expectedCountryCount"
+  | "oecdCountryCount"
+  | "sampleBackedCountryCount"
+  | "missingOecdCountries"
+  | "hasIncompleteOecdPull"
+>;
 
 async function loadIndexData(): Promise<LoadedDataFile> {
   const res = await fetch("/data/k-collusion-index.json", {
@@ -41,11 +58,26 @@ async function loadIndexData(): Promise<LoadedDataFile> {
   return { ...json, data: json.data };
 }
 
+function getRefreshMetadata(json: LoadedDataFile): RefreshMetadata {
+  return {
+    source: json.source,
+    datasetType: json.datasetType,
+    isFallback: json.isFallback,
+    expectedCountryCount: json.expectedCountryCount,
+    oecdCountryCount: json.oecdCountryCount,
+    sampleBackedCountryCount: json.sampleBackedCountryCount,
+    missingOecdCountries: json.missingOecdCountries,
+    hasIncompleteOecdPull: json.hasIncompleteOecdPull,
+  };
+}
+
 export default function DashboardClient() {
   const [data, setData] = useState<KCollusionIndex[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [refreshMetadata, setRefreshMetadata] =
+    useState<RefreshMetadata | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -55,6 +87,7 @@ export default function DashboardClient() {
       const json = await loadIndexData();
       setData(json.data);
       setLastUpdated(json.timestamp || null);
+      setRefreshMetadata(getRefreshMetadata(json));
     } catch (err) {
       setError(
         err instanceof Error
@@ -79,6 +112,7 @@ export default function DashboardClient() {
 
         setData(json.data);
         setLastUpdated(json.timestamp || null);
+        setRefreshMetadata(getRefreshMetadata(json));
       } catch (err) {
         if (cancelled) {
           return;
@@ -112,6 +146,9 @@ export default function DashboardClient() {
           value: item.indexValue,
           rank: index + 1,
           countryCode: item.countryCode,
+          source: item.source,
+          isSampleBacked: item.isSampleBacked,
+          sourceDetail: item.sourceDetail,
         })),
     [data],
   );
@@ -133,13 +170,19 @@ export default function DashboardClient() {
           item.indexValue < min.indexValue ? item : min,
         )
       : null;
+  const shouldShowQualityNotice =
+    refreshMetadata?.hasIncompleteOecdPull === true ||
+    refreshMetadata?.isFallback === true;
+  const sampleBackedCount = refreshMetadata?.sampleBackedCountryCount || 0;
+  const missingCountries = refreshMetadata?.missingOecdCountries || [];
 
   const downloadCsv = () => {
-    const csvHeader = "countryCode,countryName,indexValue,baseYear\n";
+    const csvHeader =
+      "countryCode,countryName,indexValue,baseYear,source,isSampleBacked,sourceDetail\n";
     const csvRows = data
       .map(
         (item) =>
-          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear}`,
+          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},${item.source},${item.isSampleBacked},${item.sourceDetail}`,
       )
       .join("\n");
     const blob = new Blob([csvHeader + csvRows], {
@@ -173,11 +216,21 @@ export default function DashboardClient() {
             해석합니다.
           </p>
         </div>
-        {lastUpdated && (
-          <p className={styles.updated}>
-            마지막 업데이트 {new Date(lastUpdated).toLocaleString("ko-KR")}
-          </p>
-        )}
+        <div className={styles.refreshStatus}>
+          {lastUpdated && (
+            <p className={styles.updated}>
+              마지막 업데이트 {new Date(lastUpdated).toLocaleString("ko-KR")}
+            </p>
+          )}
+          {shouldShowQualityNotice && (
+            <p className={styles.qualityNotice} role="status">
+              샘플 기반 행: {sampleBackedCount}
+              {missingCountries.length > 0
+                ? ` (${missingCountries.join(", ")})`
+                : ""}
+            </p>
+          )}
+        </div>
       </section>
 
       <section className={styles.metrics} aria-label="핵심 지표">

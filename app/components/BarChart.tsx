@@ -81,7 +81,13 @@ export default function BarChart({ data }: BarChartProps) {
             {data.map((entry) => (
               <Cell
                 key={entry.countryCode}
-                fill={entry.countryCode === "KOR" ? "#ea580c" : "#2563eb"}
+                fill={
+                  entry.countryCode === "KOR"
+                    ? "#ea580c"
+                    : entry.isSampleBacked
+                      ? "#d97706"
+                      : "#2563eb"
+                }
               />
             ))}
           </Bar>

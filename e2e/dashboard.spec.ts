@@ -5,6 +5,9 @@ type IndexDataItem = {
   countryName: string;
   indexValue: number;
   baseYear: number;
+  source: "OECD" | "sample";
+  isSampleBacked: boolean;
+  sourceDetail: string;
 };
 
 test.describe("K-Collusion Index Dashboard", () => {
@@ -56,18 +59,38 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(Array.isArray(json.data)).toBe(true);
     expect(json.data).toHaveLength(20);
     expect(json.baseYear).toBe(2023);
+    expect(json.expectedCountryCount).toBe(20);
+    expect(json.oecdCountryCount).toEqual(expect.any(Number));
+    expect(json.sampleBackedCountryCount).toEqual(expect.any(Number));
+    expect(Array.isArray(json.missingOecdCountries)).toBe(true);
+    expect(json.hasIncompleteOecdPull).toEqual(expect.any(Boolean));
 
     const firstItem = json.data[0] as IndexDataItem;
     expect(firstItem.countryCode).toBeDefined();
     expect(firstItem.countryName).toBeDefined();
     expect(firstItem.indexValue).toEqual(expect.any(Number));
     expect(firstItem.baseYear).toBe(2023);
+    expect(["OECD", "sample"]).toContain(firstItem.source);
+    expect(firstItem.isSampleBacked).toEqual(expect.any(Boolean));
+    expect(firstItem.sourceDetail).toEqual(expect.any(String));
 
     const koreaData = json.data.find(
       (item: IndexDataItem) => item.countryCode === "KOR",
     );
     expect(koreaData).toBeDefined();
     expect(koreaData.indexValue).toBe(100);
+  });
+
+  test("샘플 기반 행과 불완전 OECD metadata를 화면에 표시한다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    const response = await page.request.get("/data/k-collusion-index.json");
+    const json = await response.json();
+
+    if (json.isFallback || json.hasIncompleteOecdPull) {
+      await expect(page.getByRole("status")).toContainText("샘플 기반 행:");
+      await expect(page.getByText("샘플").first()).toBeVisible();
+    }
   });
 
   test("CSV와 JSON 다운로드 동선이 제공된다", async ({ page }) => {

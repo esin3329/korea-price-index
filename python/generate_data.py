@@ -87,15 +87,25 @@ SAMPLE_INDICES = {
 OECD_G20_CPI_DATAFLOW = "OECD.SDD.TPS,DSD_G20_PRICES@DF_G20_PRICES,1.0"
 OECD_G20_CPI_SERIES_KEY = "{countries}.A.N.CPI.IX._T.N._Z"
 OECD_API_BASE = "https://sdmx.oecd.org/public/rest/data"
+SOURCE_DETAIL_OECD = "oecd_sdmx_api"
+SOURCE_DETAIL_MISSING = "missing_from_oecd_response"
+SOURCE_DETAIL_FULL_SAMPLE = "oecd_fetch_failed_full_sample"
 
 
-def generate_sample_data(base_year: int = 2023) -> list[dict[str, object]]:
+def generate_sample_data(
+    base_year: int = 2023,
+    *,
+    source_detail: str = SOURCE_DETAIL_FULL_SAMPLE,
+) -> list[dict[str, object]]:
     data = [
         {
             "countryCode": country_code,
             "countryName": COUNTRY_NAMES[country_code],
             "indexValue": index_value,
             "baseYear": base_year,
+            "source": "sample",
+            "isSampleBacked": True,
+            "sourceDetail": source_detail,
         }
         for country_code, index_value in SAMPLE_INDICES.items()
     ]
@@ -159,7 +169,11 @@ def fetch_oecd_cpi_index(base_year: int = 2023) -> tuple[list[dict[str, object]]
         raise ValueError("OECD response did not include Korea CPI index data")
 
     sample_by_country = {
-        item["countryCode"]: item for item in generate_sample_data(base_year=base_year)
+        item["countryCode"]: item
+        for item in generate_sample_data(
+            base_year=base_year,
+            source_detail=SOURCE_DETAIL_MISSING,
+        )
     }
     missing = [country for country in G20_COUNTRIES if country not in values_by_country]
     data = [
@@ -175,10 +189,44 @@ def fetch_oecd_cpi_index(base_year: int = 2023) -> tuple[list[dict[str, object]]
             ),
             "baseYear": base_year,
             "source": "OECD" if country_code in values_by_country else "sample",
+            "isSampleBacked": country_code not in values_by_country,
+            "sourceDetail": (
+                SOURCE_DETAIL_OECD
+                if country_code in values_by_country
+                else SOURCE_DETAIL_MISSING
+            ),
         }
         for country_code in G20_COUNTRIES
     ]
     return sorted(data, key=lambda item: float(item["indexValue"]), reverse=True), missing
+
+
+def _refresh_metadata(
+    data: list[dict[str, object]],
+    missing_oecd_countries: list[str],
+) -> dict[str, object]:
+    expected_country_count = len(G20_COUNTRIES)
+    sample_backed_country_count = sum(
+        1
+        for item in data
+        if item.get("isSampleBacked") is True or item.get("source") == "sample"
+    )
+    oecd_country_count = sum(
+        1
+        for item in data
+        if item.get("source") == "OECD" and item.get("isSampleBacked") is not True
+    )
+
+    return {
+        "expectedCountryCount": expected_country_count,
+        "oecdCountryCount": oecd_country_count,
+        "sampleBackedCountryCount": sample_backed_country_count,
+        "missingOecdCountries": missing_oecd_countries,
+        "hasIncompleteOecdPull": (
+            bool(missing_oecd_countries) or oecd_country_count < expected_country_count
+        ),
+        "isFallback": sample_backed_country_count > 0,
+    }
 
 
 def save_to_json(
@@ -188,11 +236,12 @@ def save_to_json(
     base_year: int = 2023,
     source: str = "sample",
     dataset_type: str = "SAMPLE",
-    is_fallback: bool = True,
+    missing_oecd_countries: list[str] | None = None,
 ) -> Path:
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     filename = output_path / "k-collusion-index.json"
+    refresh_metadata = _refresh_metadata(data, missing_oecd_countries or [])
 
     payload = {
         "success": True,
@@ -201,7 +250,7 @@ def save_to_json(
         "baseYear": base_year,
         "source": source,
         "datasetType": dataset_type,
-        "isFallback": is_fallback,
+        **refresh_metadata,
     }
 
     with filename.open("w", encoding="utf-8") as file:
@@ -216,13 +265,12 @@ def main() -> None:
     base_year = 2023
     source = "sample"
     dataset_type = "SAMPLE"
-    is_fallback = True
+    missing = G20_COUNTRIES.copy()
 
     try:
         data, missing = fetch_oecd_cpi_index(base_year=base_year)
         source = "OECD SDMX API"
         dataset_type = "CPI_INDEX"
-        is_fallback = bool(missing)
         if missing:
             source = "OECD SDMX API with sample fallback"
             print(f"OECD response missing countries, using sample fallback: {', '.join(missing)}")
@@ -235,7 +283,7 @@ def main() -> None:
         base_year=base_year,
         source=source,
         dataset_type=dataset_type,
-        is_fallback=is_fallback,
+        missing_oecd_countries=missing,
     )
     print(f"Wrote {filename}")
     for rank, item in enumerate(data[:5], 1):

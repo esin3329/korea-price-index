@@ -38,6 +38,9 @@ export interface KCollusionIndex {
   countryName: string;
   indexValue: number;
   baseYear: number;
+  source: "OECD" | "sample";
+  isSampleBacked: boolean;
+  sourceDetail: string;
 }
 
 export interface ChartDataItem {
@@ -45,6 +48,9 @@ export interface ChartDataItem {
   value: number;
   rank: number;
   countryCode: G20CountryCode;
+  source: "OECD" | "sample";
+  isSampleBacked: boolean;
+  sourceDetail: string;
 }
 
 export interface APIResponse<T> {
