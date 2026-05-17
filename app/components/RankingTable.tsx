@@ -44,6 +44,9 @@ export default function RankingTable({ data }: RankingTableProps) {
                   {item.countryCode === "KOR" && (
                     <span className={styles.badge}>기준</span>
                   )}
+                  {item.isSampleBacked && (
+                    <span className={styles.sampleBadge}>샘플</span>
+                  )}
                 </td>
                 <td className={styles.numeric}>{item.value.toFixed(1)}</td>
                 <td
