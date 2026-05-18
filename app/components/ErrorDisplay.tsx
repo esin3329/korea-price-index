@@ -6,19 +6,20 @@ interface ErrorDisplayProps {
 }
 
 export default function ErrorDisplay({
-  message = "데이터를 불러오는 과정에서 오류가 발생했습니다.",
+  message = "Failed to load data.",
   onRetry,
 }: ErrorDisplayProps) {
   return (
     <div
       style={{
-        backgroundColor: "#fff5f5",
-        border: "1px solid #fc8181",
+        backgroundColor: "rgba(239, 68, 68, 0.12)",
+        border: "1px solid rgba(239, 68, 68, 0.38)",
         borderRadius: "8px",
         padding: "2rem",
         textAlign: "center",
-        color: "#c53030",
+        color: "#fca5a5",
         margin: "20px 0",
+        backdropFilter: "blur(12px)",
       }}
     >
       <p style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>{message}</p>
@@ -26,17 +27,18 @@ export default function ErrorDisplay({
         <button
           onClick={onRetry}
           style={{
+            minHeight: "44px",
             padding: "0.75rem 1.5rem",
-            backgroundColor: "#e53e3e",
+            background: "linear-gradient(135deg, #f59e0b, #ef4444)",
             color: "white",
             border: "none",
-            borderRadius: "6px",
+            borderRadius: "8px",
             cursor: "pointer",
             fontSize: "1rem",
-            fontWeight: 500,
+            fontWeight: 700,
           }}
         >
-          다시 시도
+          Retry
         </button>
       )}
     </div>

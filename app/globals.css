@@ -1,13 +1,20 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #0a0e1a;
+  --foreground: #f1f5f9;
+  --bg-secondary: #111827;
+  --bg-glass: rgba(255, 255, 255, 0.04);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-cyan: #06b6d4;
+  --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  --gradient-warm: linear-gradient(135deg, #f59e0b, #ef4444);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
 html {
@@ -25,7 +32,11 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--foreground);
-  background: var(--background);
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(59, 130, 246, 0.12), transparent 36rem),
+    radial-gradient(ellipse at 82% 18%, rgba(139, 92, 246, 0.1), transparent 34rem),
+    radial-gradient(ellipse at 50% 88%, rgba(236, 72, 153, 0.08), transparent 32rem),
+    var(--background);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -42,8 +53,6 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+html {
+  color-scheme: dark;
 }

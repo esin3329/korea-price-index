@@ -5,10 +5,12 @@
 }
 
 .header {
-  background-color: #1a365d;
-  color: white;
+  border-bottom: 1px solid var(--border-glass);
+  background: rgba(17, 24, 39, 0.74);
+  color: var(--foreground);
   padding: 1.5rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
 }
 
 .title {
@@ -19,13 +21,15 @@
 
 .subtitle {
   margin-top: 0.5rem;
-  color: #dbeafe;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
 .nav {
-  background-color: #2b6cb0;
+  border-bottom: 1px solid var(--border-glass);
+  background: rgba(10, 14, 26, 0.8);
   padding: 0.5rem 2rem;
+  backdrop-filter: blur(16px);
 }
 
 .navList {
@@ -40,14 +44,14 @@
   display: inline-flex;
   align-items: center;
   min-height: 40px;
-  color: #e2e8f0;
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .navItem:hover {
-  color: white;
+  color: var(--foreground);
 }
 
 .main {

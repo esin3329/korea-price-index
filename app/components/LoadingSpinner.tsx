@@ -5,7 +5,7 @@ interface LoadingSpinnerProps {
 }
 
 export default function LoadingSpinner({
-  message = "데이터를 불러오는 중...",
+  message = "Loading data...",
 }: LoadingSpinnerProps) {
   return (
     <div
@@ -14,16 +14,17 @@ export default function LoadingSpinner({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "3rem",
+        padding: "4rem 2rem",
         gap: "1rem",
+        color: "#f1f5f9",
       }}
     >
       <div
         style={{
           width: "50px",
           height: "50px",
-          border: "4px solid #e2e8f0",
-          borderTop: "4px solid #2563eb",
+          border: "4px solid rgba(255, 255, 255, 0.08)",
+          borderTop: "4px solid #3b82f6",
           borderRadius: "50%",
           animation: "spin 1s linear infinite",
         }}
@@ -38,7 +39,7 @@ export default function LoadingSpinner({
           }
         }
       `}</style>
-      <p style={{ color: "#475569", fontSize: "1rem" }}>{message}</p>
+      <p style={{ color: "#94a3b8", fontSize: "1rem" }}>{message}</p>
     </div>
   );
 }

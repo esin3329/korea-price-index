@@ -1,6 +1,6 @@
 .tableWrap {
   overflow-x: auto;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-glass);
   border-radius: 8px;
 }
 
@@ -8,7 +8,7 @@
   width: 100%;
   min-width: 520px;
   border-collapse: collapse;
-  color: #1f2937;
+  color: var(--foreground);
   font-size: 0.94rem;
 }
 
@@ -16,9 +16,9 @@
   position: sticky;
   top: 0;
   padding: 0.78rem 0.9rem;
-  border-bottom: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #475569;
+  border-bottom: 1px solid var(--border-glass);
+  background: rgba(17, 24, 39, 0.9);
+  color: var(--text-muted);
   font-size: 0.78rem;
   font-weight: 800;
   text-align: left;
@@ -26,7 +26,7 @@
 
 .table td {
   padding: 0.72rem 0.9rem;
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   vertical-align: middle;
 }
 
@@ -35,11 +35,11 @@
 }
 
 .table tbody tr:hover {
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .koreaRow {
-  background: #fff7ed;
+  background: rgba(59, 130, 246, 0.08);
   font-weight: 800;
 }
 
@@ -51,8 +51,8 @@
   display: inline-block;
   padding: 0.12rem 0.38rem;
   border-radius: 999px;
-  background: #fed7aa;
-  color: #9a3412;
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
   font-size: 0.72rem;
   font-weight: 800;
 }
@@ -62,8 +62,8 @@
   margin-left: 0.35rem;
   padding: 0.12rem 0.38rem;
   border-radius: 999px;
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
   font-size: 0.72rem;
   font-weight: 800;
 }
@@ -74,17 +74,17 @@
 }
 
 .above {
-  color: #b91c1c;
+  color: #f87171;
   font-weight: 800;
 }
 
 .below {
-  color: #166534;
+  color: #34d399;
   font-weight: 800;
 }
 
 .base {
-  color: #9a3412;
+  color: #93c5fd;
   font-weight: 800;
 }
 

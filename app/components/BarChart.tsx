@@ -34,39 +34,41 @@ export default function BarChart({ data }: BarChartProps) {
             bottom: 10,
           }}
         >
-          <CartesianGrid horizontal={false} stroke="#e5e7eb" />
+          <CartesianGrid horizontal={false} stroke="rgba(255, 255, 255, 0.08)" />
           <XAxis
             type="number"
             domain={[0, "dataMax + 10"]}
-            tick={{ fill: "#64748b", fontSize: 12 }}
-            axisLine={{ stroke: "#cbd5e1" }}
+            tick={{ fill: "#94a3b8", fontSize: 12 }}
+            axisLine={{ stroke: "rgba(255, 255, 255, 0.12)" }}
             tickLine={false}
           />
           <YAxis
             dataKey="name"
             type="category"
             width={112}
-            tick={{ fill: "#334155", fontSize: 12 }}
+            tick={{ fill: "#cbd5e1", fontSize: 12 }}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip
             formatter={(value) => [
               typeof value === "number" ? value.toFixed(1) : value,
-              "지수",
+              "Index",
             ]}
-            labelStyle={{ color: "#111827", fontWeight: 700 }}
+            labelStyle={{ color: "#f1f5f9", fontWeight: 700 }}
             contentStyle={{
-              border: "1px solid #dbe3ef",
+              background: "rgba(17, 24, 39, 0.96)",
+              color: "#f1f5f9",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
               borderRadius: "8px",
-              boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.35)",
             }}
           />
           <ReferenceLine
             x={100}
-            stroke="#dc2626"
+            stroke="#f87171"
             strokeDasharray="4 4"
-            label={{ value: "한국 100", fill: "#b91c1c", fontSize: 12 }}
+            label={{ value: "Korea 100", fill: "#f87171", fontSize: 12 }}
           />
           <Bar dataKey="value" name="K-Collusion Index" radius={[0, 4, 4, 0]}>
             <LabelList
@@ -75,7 +77,7 @@ export default function BarChart({ data }: BarChartProps) {
               formatter={(value) =>
                 typeof value === "number" ? value.toFixed(1) : value
               }
-              fill="#475569"
+              fill="#cbd5e1"
               fontSize={12}
             />
             {data.map((entry) => (
@@ -83,10 +85,10 @@ export default function BarChart({ data }: BarChartProps) {
                 key={entry.countryCode}
                 fill={
                   entry.countryCode === "KOR"
-                    ? "#ea580c"
+                    ? "#8b5cf6"
                     : entry.isSampleBacked
                       ? "#d97706"
-                      : "#2563eb"
+                      : "#3b82f6"
                 }
               />
             ))}
