@@ -58,20 +58,23 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(json.success).toBe(true);
     expect(Array.isArray(json.data)).toBe(true);
     expect(json.data).toHaveLength(20);
-    expect(json.baseYear).toBe(2023);
+    expect(json.baseYear).toBe(2021);
     expect(json.expectedCountryCount).toBe(20);
-    expect(json.oecdCountryCount).toEqual(expect.any(Number));
-    expect(json.sampleBackedCountryCount).toEqual(expect.any(Number));
+    expect(json.oecdCountryCount).toBe(20);
+    expect(json.sampleBackedCountryCount).toBe(0);
     expect(Array.isArray(json.missingOecdCountries)).toBe(true);
-    expect(json.hasIncompleteOecdPull).toEqual(expect.any(Boolean));
+    expect(json.missingOecdCountries).toEqual([]);
+    expect(json.hasIncompleteOecdPull).toBe(false);
+    expect(json.isFallback).toBe(false);
+    expect(json.datasetType).toBe("CPI_ANNUAL_RATE");
 
     const firstItem = json.data[0] as IndexDataItem;
     expect(firstItem.countryCode).toBeDefined();
     expect(firstItem.countryName).toBeDefined();
     expect(firstItem.indexValue).toEqual(expect.any(Number));
-    expect(firstItem.baseYear).toBe(2023);
-    expect(["OECD", "sample"]).toContain(firstItem.source);
-    expect(firstItem.isSampleBacked).toEqual(expect.any(Boolean));
+    expect(firstItem.baseYear).toBe(2021);
+    expect(firstItem.source).toBe("OECD");
+    expect(firstItem.isSampleBacked).toBe(false);
     expect(firstItem.sourceDetail).toEqual(expect.any(String));
 
     const koreaData = json.data.find(
@@ -81,16 +84,16 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(koreaData.indexValue).toBe(100);
   });
 
-  test("샘플 기반 행과 불완전 OECD metadata를 화면에 표시한다", async ({ page }) => {
+  test("완전 OECD 데이터에서는 샘플 경고를 표시하지 않는다", async ({ page }) => {
     await page.goto("/dashboard");
 
     const response = await page.request.get("/data/k-collusion-index.json");
     const json = await response.json();
 
-    if (json.isFallback || json.hasIncompleteOecdPull) {
-      await expect(page.getByRole("status")).toContainText("샘플 기반 행:");
-      await expect(page.getByText("샘플").first()).toBeVisible();
-    }
+    expect(json.isFallback).toBe(false);
+    expect(json.hasIncompleteOecdPull).toBe(false);
+    await expect(page.getByRole("status")).toHaveCount(0);
+    await expect(page.getByText("샘플")).toHaveCount(0);
   });
 
   test("CSV와 JSON 다운로드 동선이 제공된다", async ({ page }) => {

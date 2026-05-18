@@ -33,7 +33,7 @@ npm run dev
 python python/generate_data.py
 ```
 
-스크립트는 OECD SDMX CSV 엔드포인트에서 G20 CPI index 데이터를 가져오려고 시도합니다. OECD 호출 실패, 한국 기준값 누락, 일부 국가 누락이 발생하면 샘플 데이터로 fallback하고 `isFallback: true` 메타데이터를 JSON에 기록합니다.
+스크립트는 OECD SDMX CSV 엔드포인트에서 G20 CPI annual rate 데이터를 가져옵니다. 현재 대시보드 데이터는 샘플 fallback 없이 20개 전체 행을 OECD 응답으로 생성하며, 일부 국가 또는 한국 기준값이 누락되면 생성이 실패합니다. 생성된 JSON은 `isFallback: false`, `sampleBackedCountryCount: 0` 메타데이터를 기록합니다.
 
 생성 파일:
 

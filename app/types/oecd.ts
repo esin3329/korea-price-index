@@ -23,7 +23,7 @@ export const G20_COUNTRIES = [
 
 export type G20CountryCode = (typeof G20_COUNTRIES)[number];
 
-export const BASE_YEAR = 2023;
+export const BASE_YEAR = 2021;
 
 export interface OECDDataItem {
   countryCode: G20CountryCode;
