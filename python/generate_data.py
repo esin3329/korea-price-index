@@ -73,27 +73,31 @@ WORLD_BANK_PRICE_LEVEL_NAME = (
 DATASET_TYPE = "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE"
 SOURCE = "World Bank WDI"
 SOURCE_DETAIL = f"world_bank_wdi:{WORLD_BANK_PRICE_LEVEL_INDICATOR}"
+AUTARIO_WORLD_BANK_DATASET_API = (
+    "https://autario.com/api/v1/public/datasets/"
+    "3b933e66-0321-4ae3-adcb-ff352bfb00f0/data"
+)
 LATEST_LOOKBACK_YEARS = 8
 
 WORLD_BANK_2024_SNAPSHOT = {
-    "ARG": 0.46,
-    "AUS": 0.90,
-    "BRA": 0.46,
-    "CAN": 0.84,
-    "CHN": 0.49,
-    "FRA": 0.74,
-    "DEU": 0.76,
-    "IND": 0.24,
-    "IDN": 0.30,
-    "ITA": 0.65,
-    "JPN": 0.62,
-    "KOR": 0.59,
-    "MEX": 0.54,
-    "RUS": 0.31,
-    "SAU": 0.49,
-    "ZAF": 0.41,
-    "TUR": 0.35,
-    "GBR": 0.85,
+    "ARG": 0.459061319225925,
+    "AUS": 0.895894112849615,
+    "BRA": 0.461560073187954,
+    "CAN": 0.840153207747759,
+    "CHN": 0.490802871328148,
+    "FRA": 0.737359788150781,
+    "DEU": 0.758599340089062,
+    "IND": 0.241464271880756,
+    "IDN": 0.299449658545769,
+    "ITA": 0.649024553335156,
+    "JPN": 0.624066284421693,
+    "KOR": 0.593576396809388,
+    "MEX": 0.541744819872408,
+    "RUS": 0.314081420115992,
+    "SAU": 0.492069764351171,
+    "ZAF": 0.405480468825683,
+    "TUR": 0.34822649525949,
+    "GBR": 0.848850489420597,
     "USA": 1.00,
 }
 
@@ -141,8 +145,58 @@ def _read_world_bank_json(url: str) -> list[dict[str, object]]:
     return rows
 
 
+def _read_autario_world_bank_rows(start_year: int, end_year: int) -> list[dict[str, object]]:
+    """Read World Bank WDI rows from Autario's public source-synced mirror."""
+    required = set(G20_COUNTRIES)
+
+    for year in range(end_year, start_year - 1, -1):
+        query = urlencode(
+            {
+                "filter": f"year:eq:{year}",
+                "limit": "300",
+            }
+        )
+        request = Request(
+            f"{AUTARIO_WORLD_BANK_DATASET_API}?{query}",
+            headers={"User-Agent": "k-collusion-index/1.0"},
+        )
+        with urlopen(request, timeout=20) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+
+        data = payload.get("data") if isinstance(payload, dict) else None
+        if not isinstance(data, list):
+            continue
+
+        rows: list[dict[str, object]] = []
+        found: set[str] = set()
+        for item in data:
+            if not isinstance(item, dict):
+                continue
+            country_code = item.get("country_code")
+            value = item.get("value")
+            if country_code not in required or value is None:
+                continue
+            found.add(str(country_code))
+            rows.append(
+                {
+                    "country": {
+                        "id": country_code,
+                        "value": item.get("country") or country_code,
+                    },
+                    "countryiso3code": country_code,
+                    "date": str(item.get("year") or year),
+                    "value": value,
+                }
+            )
+
+        if required.issubset(found):
+            return rows
+
+    raise DataUnavailableError("Autario World Bank WDI mirror returned no complete G20 year")
+
+
 def _read_world_bank_rows(start_year: int, end_year: int) -> list[dict[str, object]]:
-    """Read rows from World Bank, retrying per country if the bulk call fails."""
+    """Read rows from World Bank, retrying fallbacks if the bulk call fails."""
     try:
         return _read_world_bank_json(_build_world_bank_url(start_year, end_year))
     except (HTTPError, URLError, TimeoutError, DataUnavailableError, OSError) as bulk_error:
@@ -163,10 +217,16 @@ def _read_world_bank_rows(start_year: int, end_year: int) -> list[dict[str, obje
         if rows:
             return rows
 
-        raise DataUnavailableError(
-            "World Bank API bulk and per-country fetches failed: "
-            f"{bulk_error}; failed countries: {', '.join(failures)}"
-        ) from bulk_error
+        try:
+            return _read_autario_world_bank_rows(start_year, end_year)
+        except (HTTPError, URLError, TimeoutError, DataUnavailableError, OSError) as mirror_error:
+            raise DataUnavailableError(
+                "World Bank API bulk, per-country, and mirror fetches failed: "
+                f"{bulk_error}; mirror error: {mirror_error}; "
+                f"failed countries: {', '.join(failures)}"
+            ) from bulk_error
+
+        raise DataUnavailableError("unreachable")
 
 
 def _country_code_from_row(row: dict[str, object]) -> str | None:
@@ -312,6 +372,7 @@ def save_to_json(
         "source": SOURCE,
         "sourceUrl": "https://data.worldbank.org/indicator/PA.NUS.PPPC.RF",
         "snapshotUrl": "https://macrovedia.com/series/93bfb1f66cb554dc/",
+        "mirrorSourceUrl": "https://autario.com/data/price-level-ratio-of-ppp-conversion-factor-gdp-to-market-exchange-rate-world-bank",
         "indicatorCode": WORLD_BANK_PRICE_LEVEL_INDICATOR,
         "indicatorName": WORLD_BANK_PRICE_LEVEL_NAME,
         "datasetType": DATASET_TYPE,

@@ -264,7 +264,7 @@
             </tr>
             <tr>
               <td>World Bank WDI 연동</td>
-              <td>PPP 기반 price level ratio 수집, API 불가 시 최신 WDI 스냅샷 사용</td>
+              <td>PPP 기반 price level ratio 수집, World Bank API 불가 시 WDI 동기화 공개 API 사용</td>
               <td><span class="tag">구현</span></td>
             </tr>
             <tr>
@@ -351,7 +351,7 @@ KOR.indexValue = 100.0</code></pre>
           <li>단일 연도 계산 함수: <code>calculate_k_collusion_index</code></li>
           <li>다중 연도 계산 함수: <code>calculate_multi_year_index</code></li>
           <li>정렬 기준: <code>indexValue</code> 내림차순</li>
-          <li>현재 정적 데이터 생성 스크립트는 World Bank WDI <code>PA.NUS.PPPC.RF</code>를 우선 사용하고, API가 불가하면 2024년 WDI 스냅샷을 사용합니다.</li>
+          <li>현재 정적 데이터 생성 스크립트는 World Bank WDI <code>PA.NUS.PPPC.RF</code>를 우선 사용하고, API가 불가하면 World Bank WDI 동기화 공개 API를 사용합니다.</li>
         </ul>
       </section>
 
@@ -484,10 +484,10 @@ npm run dev</code></pre>
         <h2>8. 확인된 이슈와 개선 필요사항</h2>
         <div class="note">
           CPI 상승률은 국가 간 물가 수준 비교에 부적합하므로 PPP 기반 price level ratio로 교체했습니다.
-          남은 작업은 World Bank API 접근 안정화와 EU 집계 처리 정책 결정입니다.
+          남은 작업은 EU 집계 처리 정책 결정입니다.
         </div>
         <ul>
-          <li>World Bank API가 응답하지 않으면 최신 2024년 WDI 스냅샷을 사용하며 <code>isFallback</code>으로 표시합니다.</li>
+          <li>World Bank API가 응답하지 않으면 WDI 동기화 공개 API를 사용하고, 모든 온라인 경로가 실패할 때만 2024년 WDI 스냅샷을 사용하며 <code>isFallback</code>으로 표시합니다.</li>
           <li>EU 집계는 같은 WDI country-level 지표로 일관되게 비교하기 어려워 현재 비교 대상에서 제외했습니다.</li>
           <li>Cloudflare Pages 대시보드에 build command를 설정하면 <code>out</code> 커밋 의존성을 줄일 수 있습니다.</li>
         </ul>

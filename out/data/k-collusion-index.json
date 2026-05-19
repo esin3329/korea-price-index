@@ -4,7 +4,7 @@
     {
       "countryCode": "USA",
       "countryName": "미국",
-      "indexValue": 169.49,
+      "indexValue": 168.47,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
@@ -13,65 +13,65 @@
     {
       "countryCode": "AUS",
       "countryName": "호주",
-      "indexValue": 152.54,
+      "indexValue": 150.93,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.9
+      "rawPriceLevelRatio": 0.895894
     },
     {
       "countryCode": "GBR",
       "countryName": "영국",
-      "indexValue": 144.07,
+      "indexValue": 143.01,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.85
+      "rawPriceLevelRatio": 0.84885
     },
     {
       "countryCode": "CAN",
       "countryName": "캐나다",
-      "indexValue": 142.37,
+      "indexValue": 141.54,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.84
+      "rawPriceLevelRatio": 0.840153
     },
     {
       "countryCode": "DEU",
       "countryName": "독일",
-      "indexValue": 128.81,
+      "indexValue": 127.8,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.76
+      "rawPriceLevelRatio": 0.758599
     },
     {
       "countryCode": "FRA",
       "countryName": "프랑스",
-      "indexValue": 125.42,
+      "indexValue": 124.22,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.74
+      "rawPriceLevelRatio": 0.73736
     },
     {
       "countryCode": "ITA",
       "countryName": "이탈리아",
-      "indexValue": 110.17,
+      "indexValue": 109.34,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.65
+      "rawPriceLevelRatio": 0.649025
     },
     {
       "countryCode": "JPN",
       "countryName": "일본",
-      "indexValue": 105.08,
+      "indexValue": 105.14,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.62
+      "rawPriceLevelRatio": 0.624066
     },
     {
       "countryCode": "KOR",
@@ -80,88 +80,88 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.59
+      "rawPriceLevelRatio": 0.593576
     },
     {
       "countryCode": "MEX",
       "countryName": "멕시코",
-      "indexValue": 91.53,
+      "indexValue": 91.27,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.54
-    },
-    {
-      "countryCode": "CHN",
-      "countryName": "중국",
-      "indexValue": 83.05,
-      "baseYear": 2024,
-      "source": "World Bank WDI",
-      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.49
+      "rawPriceLevelRatio": 0.541745
     },
     {
       "countryCode": "SAU",
       "countryName": "사우디아라비아",
-      "indexValue": 83.05,
+      "indexValue": 82.9,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.49
+      "rawPriceLevelRatio": 0.49207
     },
     {
-      "countryCode": "ARG",
-      "countryName": "아르헨티나",
-      "indexValue": 77.97,
+      "countryCode": "CHN",
+      "countryName": "중국",
+      "indexValue": 82.69,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.46
+      "rawPriceLevelRatio": 0.490803
     },
     {
       "countryCode": "BRA",
       "countryName": "브라질",
-      "indexValue": 77.97,
+      "indexValue": 77.76,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.46
+      "rawPriceLevelRatio": 0.46156
+    },
+    {
+      "countryCode": "ARG",
+      "countryName": "아르헨티나",
+      "indexValue": 77.34,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.459061
     },
     {
       "countryCode": "ZAF",
       "countryName": "남아프리카공화국",
-      "indexValue": 69.49,
+      "indexValue": 68.31,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.41
+      "rawPriceLevelRatio": 0.40548
     },
     {
       "countryCode": "TUR",
       "countryName": "튀르키예",
-      "indexValue": 59.32,
+      "indexValue": 58.67,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.35
+      "rawPriceLevelRatio": 0.348226
     },
     {
       "countryCode": "RUS",
       "countryName": "러시아",
-      "indexValue": 52.54,
+      "indexValue": 52.91,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.31
+      "rawPriceLevelRatio": 0.314081
     },
     {
       "countryCode": "IDN",
       "countryName": "인도네시아",
-      "indexValue": 50.85,
+      "indexValue": 50.45,
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.3
+      "rawPriceLevelRatio": 0.29945
     },
     {
       "countryCode": "IND",
@@ -170,14 +170,15 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.24
+      "rawPriceLevelRatio": 0.241464
     }
   ],
-  "timestamp": "2026-05-19T13:56:14.059870+00:00",
+  "timestamp": "2026-05-19T14:08:45.706554+00:00",
   "baseYear": 2024,
   "source": "World Bank WDI",
   "sourceUrl": "https://data.worldbank.org/indicator/PA.NUS.PPPC.RF",
   "snapshotUrl": "https://macrovedia.com/series/93bfb1f66cb554dc/",
+  "mirrorSourceUrl": "https://autario.com/data/price-level-ratio-of-ppp-conversion-factor-gdp-to-market-exchange-rate-world-bank",
   "indicatorCode": "PA.NUS.PPPC.RF",
   "indicatorName": "Price level ratio of PPP conversion factor (GDP) to market exchange rate",
   "datasetType": "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE",
@@ -186,6 +187,6 @@
   "officialCountryCount": 19,
   "missingCountries": [],
   "hasIncompleteOfficialPull": false,
-  "isFallback": true,
-  "fallbackReason": "World Bank API unavailable; using latest checked-in WDI snapshot"
+  "isFallback": false,
+  "fallbackReason": null
 }

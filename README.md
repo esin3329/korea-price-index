@@ -11,7 +11,8 @@ K-Collusion Index는 대한민국의 물가 수준을 100으로 두고 주요 G2
 - 지표명: Price level ratio of PPP conversion factor (GDP) to market exchange rate
 - 의미: PPP conversion factor와 시장환율의 비율로 계산되는 국가별 가격수준 비율
 - 기준화: World Bank 원자료를 대한민국 값으로 나누어 `KOR = 100`으로 재산정
-- 최신 스냅샷: 2024년
+- 최신 반영 연도: 2024년
+- 수집 경로: World Bank API를 우선 사용하고, 응답 장애 시 World Bank WDI를 동기화한 Autario 공개 API를 사용
 - 범위: World Bank country-level 데이터가 제공되는 G20 회원국 19개국
 - 제외: EU 집계는 같은 WDI country-level 지표로 일관되게 비교하기 어려워 제외
 
@@ -46,7 +47,7 @@ npm run dev
 python python/generate_data.py
 ```
 
-스크립트는 World Bank WDI API에서 최신 공통 연도의 `PA.NUS.PPPC.RF` 데이터를 가져오려고 시도합니다. 현재 로컬/빌드 환경에서 API가 응답하지 않는 경우에는 2024년 World Bank WDI 스냅샷을 사용해 동일한 JSON 구조를 생성합니다.
+스크립트는 World Bank WDI API에서 최신 공통 연도의 `PA.NUS.PPPC.RF` 데이터를 가져오려고 시도합니다. World Bank API가 응답하지 않는 경우에는 World Bank WDI를 동기화한 Autario 공개 API를 사용하고, 모든 온라인 경로가 실패할 때만 체크인된 2024년 WDI 스냅샷을 사용해 동일한 JSON 구조를 생성합니다.
 
 생성 파일:
 
