@@ -57,6 +57,13 @@
   white-space: nowrap;
 }
 
+.sourceLine {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
 .qualityNotice {
   padding: 0.55rem 0.7rem;
   border: 1px solid rgba(245, 158, 11, 0.4);
@@ -184,6 +191,10 @@
 
   .updated {
     white-space: normal;
+  }
+
+  .sourceLine {
+    text-align: left;
   }
 
   .qualityNotice {

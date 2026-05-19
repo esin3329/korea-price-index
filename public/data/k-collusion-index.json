@@ -2,194 +2,190 @@
   "success": true,
   "data": [
     {
-      "countryCode": "ARG",
-      "countryName": "아르헨티나",
-      "indexValue": 144.79,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "TUR",
-      "countryName": "튀르키예",
-      "indexValue": 116.68,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "BRA",
-      "countryName": "브라질",
-      "indexValue": 105.66,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "RUS",
-      "countryName": "러시아",
-      "indexValue": 104.09,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "MEX",
-      "countryName": "멕시코",
-      "indexValue": 103.11,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "IND",
-      "countryName": "인도",
-      "indexValue": 102.33,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
       "countryCode": "USA",
       "countryName": "미국",
-      "indexValue": 102.15,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "ZAF",
-      "countryName": "남아프리카공화국",
-      "indexValue": 102.07,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "CAN",
-      "countryName": "캐나다",
-      "indexValue": 100.87,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "DEU",
-      "countryName": "독일",
-      "indexValue": 100.68,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "SAU",
-      "countryName": "사우디아라비아",
-      "indexValue": 100.62,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "EU27",
-      "countryName": "유럽연합",
-      "indexValue": 100.39,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
+      "indexValue": 169.49,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 1.0
     },
     {
       "countryCode": "AUS",
       "countryName": "호주",
-      "indexValue": 100.36,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
+      "indexValue": 152.54,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.9
     },
     {
       "countryCode": "GBR",
       "countryName": "영국",
-      "indexValue": 100.08,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
+      "indexValue": 144.07,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.85
+    },
+    {
+      "countryCode": "CAN",
+      "countryName": "캐나다",
+      "indexValue": 142.37,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.84
+    },
+    {
+      "countryCode": "DEU",
+      "countryName": "독일",
+      "indexValue": 128.81,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.76
+    },
+    {
+      "countryCode": "FRA",
+      "countryName": "프랑스",
+      "indexValue": 125.42,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.74
+    },
+    {
+      "countryCode": "ITA",
+      "countryName": "이탈리아",
+      "indexValue": 110.17,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.65
+    },
+    {
+      "countryCode": "JPN",
+      "countryName": "일본",
+      "indexValue": 105.08,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.62
     },
     {
       "countryCode": "KOR",
       "countryName": "대한민국",
       "indexValue": 100.0,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.59
     },
     {
-      "countryCode": "FRA",
-      "countryName": "프랑스",
-      "indexValue": 99.61,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "ITA",
-      "countryName": "이탈리아",
-      "indexValue": 99.51,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
-    },
-    {
-      "countryCode": "IDN",
-      "countryName": "인도네시아",
-      "indexValue": 99.08,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
+      "countryCode": "MEX",
+      "countryName": "멕시코",
+      "indexValue": 91.53,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.54
     },
     {
       "countryCode": "CHN",
       "countryName": "중국",
-      "indexValue": 98.44,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
+      "indexValue": 83.05,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.49
     },
     {
-      "countryCode": "JPN",
-      "countryName": "일본",
-      "indexValue": 97.32,
-      "baseYear": 2021,
-      "source": "OECD",
-      "isSampleBacked": false,
-      "sourceDetail": "oecd_sdmx_api:cpi_annual_rate"
+      "countryCode": "SAU",
+      "countryName": "사우디아라비아",
+      "indexValue": 83.05,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.49
+    },
+    {
+      "countryCode": "ARG",
+      "countryName": "아르헨티나",
+      "indexValue": 77.97,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.46
+    },
+    {
+      "countryCode": "BRA",
+      "countryName": "브라질",
+      "indexValue": 77.97,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.46
+    },
+    {
+      "countryCode": "ZAF",
+      "countryName": "남아프리카공화국",
+      "indexValue": 69.49,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.41
+    },
+    {
+      "countryCode": "TUR",
+      "countryName": "튀르키예",
+      "indexValue": 59.32,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.35
+    },
+    {
+      "countryCode": "RUS",
+      "countryName": "러시아",
+      "indexValue": 52.54,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.31
+    },
+    {
+      "countryCode": "IDN",
+      "countryName": "인도네시아",
+      "indexValue": 50.85,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.3
+    },
+    {
+      "countryCode": "IND",
+      "countryName": "인도",
+      "indexValue": 40.68,
+      "baseYear": 2024,
+      "source": "World Bank WDI",
+      "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
+      "rawPriceLevelRatio": 0.24
     }
   ],
-  "timestamp": "2026-05-19T21:46:20.037306",
-  "baseYear": 2021,
-  "source": "OECD SDMX API",
-  "datasetType": "CPI_ANNUAL_RATE",
-  "expectedCountryCount": 20,
-  "oecdCountryCount": 20,
-  "sampleBackedCountryCount": 0,
-  "missingOecdCountries": [],
-  "hasIncompleteOecdPull": false,
-  "isFallback": false
+  "timestamp": "2026-05-19T13:22:49.191182+00:00",
+  "baseYear": 2024,
+  "source": "World Bank WDI",
+  "sourceUrl": "https://data.worldbank.org/indicator/PA.NUS.PPPC.RF",
+  "snapshotUrl": "https://macrovedia.com/series/93bfb1f66cb554dc/",
+  "indicatorCode": "PA.NUS.PPPC.RF",
+  "indicatorName": "Price level ratio of PPP conversion factor (GDP) to market exchange rate",
+  "datasetType": "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE",
+  "methodology": "World Bank price level ratio rebased so Korea equals 100",
+  "expectedCountryCount": 19,
+  "officialCountryCount": 19,
+  "missingCountries": [],
+  "hasIncompleteOfficialPull": false,
+  "isFallback": true,
+  "fallbackReason": "World Bank API unavailable; using latest checked-in WDI snapshot"
 }

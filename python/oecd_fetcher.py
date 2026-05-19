@@ -1,4 +1,10 @@
-"""OECD SDMX CSV fetch helpers for G20 CPI and PPP data."""
+"""Official data fetch helpers for price-level comparison work.
+
+The production dashboard uses World Bank WDI price level ratios. OECD PPP
+helpers are kept for exploratory validation where OECD country coverage is
+sufficient, but CPI inflation rates are not used for cross-country price-level
+ranking.
+"""
 
 from __future__ import annotations
 
@@ -29,7 +35,6 @@ G20_COUNTRIES = [
     "TUR",
     "GBR",
     "USA",
-    "EU27",
 ]
 
 COUNTRY_NAMES = {
@@ -52,14 +57,11 @@ COUNTRY_NAMES = {
     "TUR": "튀르키예",
     "GBR": "영국",
     "USA": "미국",
-    "EU27": "유럽연합",
 }
 
 OECD_API_BASE = "https://sdmx.oecd.org/public/rest/data"
-OECD_G20_CPI_DATAFLOW = "OECD.SDD.TPS,DSD_G20_PRICES@DF_G20_PRICES,1.0"
-OECD_G20_CPI_SERIES_KEY = "{countries}.A.N.CPI.IX._T.N._Z"
-OECD_PPP_DATAFLOW = "OECD.SDD.TPS,DSD_PPP@DF_PPP,1.0"
-OECD_PPP_SERIES_KEY = "{countries}.A.PPP.E0122..OECD"
+OECD_PPP_CPL_DATAFLOW = "OECD.SDD.TPS,DSD_PPP@DF_PPP_CPL,1.1"
+OECD_AIC_PRICE_LEVEL_KEY = "{countries}.A.PL.A01.IX.USA"
 
 
 def _build_oecd_url(
@@ -147,65 +149,31 @@ def _rows_to_dataframe(
     )
 
 
-def fetch_cpi_data(
+def fetch_oecd_aic_price_levels(
     countries: list[str] | None = None,
-    start_year: int = 2020,
+    start_year: int = 2022,
     end_year: int = 2024,
 ) -> pd.DataFrame:
-    """Fetch annual G20 CPI index observations from OECD SDMX CSV."""
-    if countries is None:
-        countries = G20_COUNTRIES
+    """Fetch OECD actual-individual-consumption price level indices.
 
-    series_key = OECD_G20_CPI_SERIES_KEY.format(countries="+".join(countries))
+    This is not used as the production source because OECD PPP coverage does not
+    consistently include every G20 member in this project.
+    """
+    if countries is None:
+        countries = ["AUS", "CAN", "FRA", "DEU", "ITA", "JPN", "KOR", "GBR", "USA"]
+
+    series_key = OECD_AIC_PRICE_LEVEL_KEY.format(countries="+".join(countries))
     rows = _read_oecd_csv(
-        _build_oecd_url(OECD_G20_CPI_DATAFLOW, series_key, start_year, end_year)
+        _build_oecd_url(OECD_PPP_CPL_DATAFLOW, series_key, start_year, end_year)
     )
     return _rows_to_dataframe(
         rows,
         countries=countries,
         start_year=start_year,
         end_year=end_year,
-        dataset_type="CPI",
-    )
-
-
-def fetch_ppp_data(
-    countries: list[str] | None = None,
-    start_year: int = 2020,
-    end_year: int = 2024,
-) -> pd.DataFrame:
-    """Fetch annual OECD PPP observations for individual consumption."""
-    if countries is None:
-        countries = G20_COUNTRIES
-
-    series_key = OECD_PPP_SERIES_KEY.format(countries="+".join(countries))
-    rows = _read_oecd_csv(
-        _build_oecd_url(OECD_PPP_DATAFLOW, series_key, start_year, end_year)
-    )
-    return _rows_to_dataframe(
-        rows,
-        countries=countries,
-        start_year=start_year,
-        end_year=end_year,
-        dataset_type="PPP",
-    )
-
-
-def fetch_oecd_data(
-    dataflow_id: str,
-    series_key: str,
-    start_year: int,
-    end_year: int,
-) -> list[dict[str, str]]:
-    """Fetch raw OECD SDMX CSV rows for a fully specified dataflow/key."""
-    return _read_oecd_csv(
-        _build_oecd_url(dataflow_id, series_key, start_year, end_year)
+        dataset_type="OECD_AIC_PRICE_LEVEL",
     )
 
 
 if __name__ == "__main__":
-    print("Testing CPI data fetch...")
-    print(fetch_cpi_data(["KOR", "USA", "JPN"], 2023, 2023))
-
-    print("\nTesting PPP data fetch...")
-    print(fetch_ppp_data(["KOR", "USA", "JPN"], 2023, 2023))
+    print(fetch_oecd_aic_price_levels(["KOR", "USA", "JPN"], 2024, 2024))

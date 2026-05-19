@@ -197,7 +197,7 @@
     <header>
       <h1>K-Collusion Index 스펙 정리</h1>
       <p>
-        한국을 기준값 100으로 두고 G20 주요 국가의 상대 물가 지수를 비교하는
+        한국을 기준값 100으로 두고 주요 G20 회원국의 상대 물가 수준을 비교하는
         정적 대시보드 프로젝트의 현재 구현 기준 스펙입니다.
       </p>
     </header>
@@ -223,7 +223,7 @@
           </div>
           <div class="card">
             <strong>핵심 목적</strong>
-            한국 기준 상대 물가 수준을 G20 국가별로 한 화면에서 비교
+            한국 기준 상대 물가 수준을 World Bank WDI country-level 데이터가 있는 G20 회원국별로 비교
           </div>
           <div class="card">
             <strong>기준값</strong>
@@ -231,7 +231,7 @@
           </div>
           <div class="card">
             <strong>기준 연도</strong>
-            현재 데이터 파일 기준 <code>2023</code>
+            현재 데이터 파일 기준 <code>2024</code>
           </div>
         </div>
       </section>
@@ -263,8 +263,8 @@
               <td><span class="tag">구현</span></td>
             </tr>
             <tr>
-              <td>OECD 연동</td>
-              <td>OECD SDMX API 기반 CPI 데이터 수집, 실패 시 샘플 데이터 fallback</td>
+              <td>World Bank WDI 연동</td>
+              <td>PPP 기반 price level ratio 수집, API 불가 시 최신 WDI 스냅샷 사용</td>
               <td><span class="tag">구현</span></td>
             </tr>
             <tr>
@@ -298,11 +298,11 @@
       "countryCode": "USA",
       "countryName": "미국",
       "indexValue": 125.5,
-      "baseYear": 2023
+      "baseYear": 2024
     }
   ],
   "timestamp": "2026-05-10T08:11:12.236069",
-  "baseYear": 2023
+  "baseYear": 2024
 }</code></pre>
 
         <h3>프론트엔드 타입</h3>
@@ -351,7 +351,7 @@ KOR.indexValue = 100.0</code></pre>
           <li>단일 연도 계산 함수: <code>calculate_k_collusion_index</code></li>
           <li>다중 연도 계산 함수: <code>calculate_multi_year_index</code></li>
           <li>정렬 기준: <code>indexValue</code> 내림차순</li>
-          <li>현재 정적 데이터 생성 스크립트는 OECD CPI index 데이터를 우선 사용하고, 실패 시 샘플 지수값으로 fallback합니다.</li>
+          <li>현재 정적 데이터 생성 스크립트는 World Bank WDI <code>PA.NUS.PPPC.RF</code>를 우선 사용하고, API가 불가하면 2024년 WDI 스냅샷을 사용합니다.</li>
         </ul>
       </section>
 
@@ -483,14 +483,13 @@ npm run dev</code></pre>
       <section id="risks">
         <h2>8. 확인된 이슈와 개선 필요사항</h2>
         <div class="note">
-          한국어 UI 문구, 테스트 문자열, 국가명 매핑은 UTF-8 기준으로 복구했습니다.
-          남은 작업은 OECD 응답 변동에 대한 데이터 품질 검증 강화입니다.
+          CPI 상승률은 국가 간 물가 수준 비교에 부적합하므로 PPP 기반 price level ratio로 교체했습니다.
+          남은 작업은 World Bank API 접근 안정화와 EU 집계 처리 정책 결정입니다.
         </div>
         <ul>
-          <li>OECD API가 일부 국가의 CPI index 값을 반환하지 않으면 샘플 데이터로 fallback합니다.</li>
-          <li>fallback 여부는 JSON의 <code>isFallback</code>, <code>source</code>, <code>datasetType</code> 메타데이터로 확인합니다.</li>
-          <li>OECD 데이터가 실제 배포 기준으로 충분히 안정적인지 주간 업데이트 로그를 모니터링해야 합니다.</li>
-          <li>샘플 데이터 fallback이 장기간 유지될 경우 사용자에게 데이터 출처 상태를 UI에서 표시하는 개선이 필요합니다.</li>
+          <li>World Bank API가 응답하지 않으면 최신 2024년 WDI 스냅샷을 사용하며 <code>isFallback</code>으로 표시합니다.</li>
+          <li>EU 집계는 같은 WDI country-level 지표로 일관되게 비교하기 어려워 현재 비교 대상에서 제외했습니다.</li>
+          <li>Cloudflare Pages 대시보드에 build command를 설정하면 <code>out</code> 커밋 의존성을 줄일 수 있습니다.</li>
         </ul>
       </section>
     </main>

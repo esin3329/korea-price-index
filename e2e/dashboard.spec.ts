@@ -5,9 +5,9 @@ type IndexDataItem = {
   countryName: string;
   indexValue: number;
   baseYear: number;
-  source: "OECD" | "sample";
-  isSampleBacked: boolean;
+  source: string;
   sourceDetail: string;
+  rawPriceLevelRatio: number;
 };
 
 test.describe("K-Collusion Index Dashboard", () => {
@@ -16,7 +16,7 @@ test.describe("K-Collusion Index Dashboard", () => {
 
     await expect(page).toHaveTitle(/K-Collusion Index/);
     await expect(
-      page.getByRole("heading", { name: "한국 물가 국제 비교" }),
+      page.getByRole("heading", { name: "한국 기준 국제 물가 수준 비교" }),
     ).toBeVisible();
   });
 
@@ -25,21 +25,21 @@ test.describe("K-Collusion Index Dashboard", () => {
 
     await expect(page.getByText("기준 국가")).toBeVisible();
     await expect(page.getByText("평균 지수")).toBeVisible();
-    await expect(page.getByText("최고 물가")).toBeVisible();
-    await expect(page.getByText("최저 물가")).toBeVisible();
+    await expect(page.getByText("가장 높은 물가 수준")).toBeVisible();
+    await expect(page.getByText("가장 낮은 물가 수준")).toBeVisible();
   });
 
   test("차트와 순위표가 표시된다", async ({ page }) => {
     await page.goto("/dashboard");
 
-    await expect(page.getByText("물가 지수 비교")).toBeVisible();
+    await expect(page.getByText("물가 수준 지수 비교")).toBeVisible();
     await expect(page.locator(".recharts-wrapper")).toBeVisible({
       timeout: 10000,
     });
     await expect(page.getByText("국가별 순위")).toBeVisible();
 
     const rows = page.locator("table tbody tr");
-    await expect(rows).toHaveCount(20);
+    await expect(rows).toHaveCount(19);
   });
 
   test("대한민국은 기준 지수 100으로 표시된다", async ({ page }) => {
@@ -50,32 +50,33 @@ test.describe("K-Collusion Index Dashboard", () => {
     await expect(koreaRow).toContainText("기준");
   });
 
-  test("정적 JSON 데이터 파일이 올바른 구조를 가진다", async ({ page }) => {
+  test("정적 JSON 데이터 파일이 올바른 공식 데이터 구조를 가진다", async ({ page }) => {
     const response = await page.request.get("/data/k-collusion-index.json");
     expect(response.ok()).toBeTruthy();
 
     const json = await response.json();
     expect(json.success).toBe(true);
     expect(Array.isArray(json.data)).toBe(true);
-    expect(json.data).toHaveLength(20);
-    expect(json.baseYear).toBe(2021);
-    expect(json.expectedCountryCount).toBe(20);
-    expect(json.oecdCountryCount).toBe(20);
-    expect(json.sampleBackedCountryCount).toBe(0);
-    expect(Array.isArray(json.missingOecdCountries)).toBe(true);
-    expect(json.missingOecdCountries).toEqual([]);
-    expect(json.hasIncompleteOecdPull).toBe(false);
-    expect(json.isFallback).toBe(false);
-    expect(json.datasetType).toBe("CPI_ANNUAL_RATE");
+    expect(json.data).toHaveLength(19);
+    expect(json.expectedCountryCount).toBe(19);
+    expect(json.officialCountryCount).toBe(19);
+    expect(json.missingCountries).toEqual([]);
+    expect(json.hasIncompleteOfficialPull).toBe(false);
+    expect(json.isFallback).toEqual(expect.any(Boolean));
+    expect(json.source).toBe("World Bank WDI");
+    expect(json.indicatorCode).toBe("PA.NUS.PPPC.RF");
+    expect(json.datasetType).toBe(
+      "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE",
+    );
 
     const firstItem = json.data[0] as IndexDataItem;
     expect(firstItem.countryCode).toBeDefined();
     expect(firstItem.countryName).toBeDefined();
     expect(firstItem.indexValue).toEqual(expect.any(Number));
-    expect(firstItem.baseYear).toBe(2021);
-    expect(firstItem.source).toBe("OECD");
-    expect(firstItem.isSampleBacked).toBe(false);
-    expect(firstItem.sourceDetail).toEqual(expect.any(String));
+    expect(firstItem.baseYear).toEqual(expect.any(Number));
+    expect(firstItem.source).toBe("World Bank WDI");
+    expect(firstItem.sourceDetail).toBe("world_bank_wdi:PA.NUS.PPPC.RF");
+    expect(firstItem.rawPriceLevelRatio).toEqual(expect.any(Number));
 
     const koreaData = json.data.find(
       (item: IndexDataItem) => item.countryCode === "KOR",
@@ -84,16 +85,13 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(koreaData.indexValue).toBe(100);
   });
 
-  test("완전 OECD 데이터에서는 샘플 경고를 표시하지 않는다", async ({ page }) => {
+  test("완전한 공식 데이터에서는 누락 경고를 표시하지 않는다", async ({ page }) => {
     await page.goto("/dashboard");
 
     const response = await page.request.get("/data/k-collusion-index.json");
     const json = await response.json();
 
-    expect(json.isFallback).toBe(false);
-    expect(json.hasIncompleteOecdPull).toBe(false);
-    await expect(page.getByRole("status")).toHaveCount(0);
-    await expect(page.getByText("샘플")).toHaveCount(0);
+    expect(json.hasIncompleteOfficialPull).toBe(false);
   });
 
   test("CSV와 JSON 다운로드 동선이 제공된다", async ({ page }) => {

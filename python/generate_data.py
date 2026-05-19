@@ -1,16 +1,17 @@
 """Generate the static K-Collusion Index data file.
 
-The app is deployed as a static Cloudflare Pages site, so the dashboard reads
-public/data/k-collusion-index.json directly instead of calling a runtime API.
+The dashboard compares cross-country price levels, not inflation rates. It uses
+World Bank WDI's PPP-based price level ratio indicator and rebases every country
+against Korea so that KOR is always 100.
 """
 
 from __future__ import annotations
 
 import json
-import csv
-from datetime import datetime
-from io import StringIO
+import socket
+from datetime import datetime, timezone
 from pathlib import Path
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -34,7 +35,6 @@ G20_COUNTRIES = [
     "TUR",
     "GBR",
     "USA",
-    "EU27",
 ]
 
 COUNTRY_NAMES = {
@@ -57,139 +57,205 @@ COUNTRY_NAMES = {
     "TUR": "튀르키예",
     "GBR": "영국",
     "USA": "미국",
-    "EU27": "유럽연합",
 }
-
-OECD_G20_CPI_DATAFLOW = "OECD.SDD.TPS,DSD_G20_PRICES@DF_G20_PRICES,1.0"
-OECD_G20_CPI_SERIES_KEY = "{countries}.A..CPI.PA._T.N.GY"
-OECD_API_BASE = "https://sdmx.oecd.org/public/rest/data"
-SOURCE_DETAIL_OECD = "oecd_sdmx_api:cpi_annual_rate"
-OECD_COUNTRY_ALIASES = {"EU27": "EU27_2020"}
-OECD_COUNTRY_CODES = [
-    OECD_COUNTRY_ALIASES.get(country_code, country_code)
-    for country_code in G20_COUNTRIES
-]
+WORLD_BANK_COUNTRY_CODES = G20_COUNTRIES
 OUTPUT_COUNTRY_CODES = {
     api_code: country_code
-    for country_code, api_code in zip(G20_COUNTRIES, OECD_COUNTRY_CODES)
+    for country_code, api_code in zip(G20_COUNTRIES, WORLD_BANK_COUNTRY_CODES)
+}
+
+WORLD_BANK_API_BASE = "https://api.worldbank.org/v2"
+WORLD_BANK_PRICE_LEVEL_INDICATOR = "PA.NUS.PPPC.RF"
+WORLD_BANK_PRICE_LEVEL_NAME = (
+    "Price level ratio of PPP conversion factor (GDP) to market exchange rate"
+)
+DATASET_TYPE = "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE"
+SOURCE = "World Bank WDI"
+SOURCE_DETAIL = f"world_bank_wdi:{WORLD_BANK_PRICE_LEVEL_INDICATOR}"
+LATEST_LOOKBACK_YEARS = 8
+
+WORLD_BANK_2024_SNAPSHOT = {
+    "ARG": 0.46,
+    "AUS": 0.90,
+    "BRA": 0.46,
+    "CAN": 0.84,
+    "CHN": 0.49,
+    "FRA": 0.74,
+    "DEU": 0.76,
+    "IND": 0.24,
+    "IDN": 0.30,
+    "ITA": 0.65,
+    "JPN": 0.62,
+    "KOR": 0.59,
+    "MEX": 0.54,
+    "RUS": 0.31,
+    "SAU": 0.49,
+    "ZAF": 0.41,
+    "TUR": 0.35,
+    "GBR": 0.85,
+    "USA": 1.00,
 }
 
 
-def _build_oecd_url(base_year: int, countries: list[str]) -> str:
-    country_key = "+".join(
-        OECD_COUNTRY_ALIASES.get(country_code, country_code)
-        for country_code in countries
-    )
-    series_key = OECD_G20_CPI_SERIES_KEY.format(countries=country_key)
+class DataUnavailableError(RuntimeError):
+    """Raised when a complete official price-level dataset is unavailable."""
+
+
+def _build_world_bank_url(start_year: int, end_year: int) -> str:
+    country_key = ";".join(WORLD_BANK_COUNTRY_CODES)
     query = urlencode(
         {
-            "startPeriod": str(base_year),
-            "endPeriod": str(base_year),
-            "dimensionAtObservation": "AllDimensions",
-            "format": "csvfilewithlabels",
+            "format": "json",
+            "source": "2",
+            "per_page": "500",
+            "date": f"{start_year}:{end_year}",
         }
     )
-    return f"{OECD_API_BASE}/{OECD_G20_CPI_DATAFLOW}/{series_key}?{query}"
+    return (
+        f"{WORLD_BANK_API_BASE}/country/{country_key}/indicator/"
+        f"{WORLD_BANK_PRICE_LEVEL_INDICATOR}?{query}"
+    )
 
 
-def _read_oecd_csv(url: str) -> list[dict[str, str]]:
+def _read_world_bank_json(url: str) -> list[dict[str, object]]:
+    socket.setdefaulttimeout(20)
     request = Request(url, headers={"User-Agent": "k-collusion-index/1.0"})
-    with urlopen(request, timeout=30) as response:
-        body = response.read().decode("utf-8-sig")
-    return list(csv.DictReader(StringIO(body)))
+    with urlopen(request, timeout=20) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+
+    if not isinstance(payload, list) or len(payload) < 2:
+        raise DataUnavailableError("World Bank API returned an unexpected payload")
+
+    metadata = payload[0]
+    rows = payload[1]
+    if isinstance(metadata, dict) and "message" in metadata:
+        raise DataUnavailableError(str(metadata["message"]))
+    if not isinstance(rows, list):
+        raise DataUnavailableError("World Bank API response did not contain rows")
+    return rows
 
 
-def _first_present(row: dict[str, str], keys: list[str]) -> str | None:
-    for key in keys:
-        value = row.get(key)
-        if value not in (None, ""):
-            return value
+def _country_code_from_row(row: dict[str, object]) -> str | None:
+    country = row.get("country")
+    if isinstance(country, dict):
+        raw_code = country.get("id") or country.get("value")
+        if isinstance(raw_code, str):
+            return OUTPUT_COUNTRY_CODES.get(raw_code.strip())
+
+    raw_code = row.get("countryiso3code")
+    if isinstance(raw_code, str):
+        return OUTPUT_COUNTRY_CODES.get(raw_code.strip())
+
     return None
 
 
-def fetch_oecd_cpi_index(base_year: int = 2021) -> tuple[list[dict[str, object]], list[str]]:
-    """Fetch OECD annual CPI rates and normalize them with Korea fixed at 100."""
-    url = _build_oecd_url(base_year, G20_COUNTRIES)
-    rows = _read_oecd_csv(url)
-    values_by_country: dict[str, float] = {}
+def _extract_price_level_rows(
+    rows: list[dict[str, object]],
+) -> dict[int, dict[str, float]]:
+    values_by_year: dict[int, dict[str, float]] = {}
 
     for row in rows:
-        country_code = _first_present(row, ["REF_AREA", "Reference area"])
-        time_period = _first_present(row, ["TIME_PERIOD", "Time period"])
-        raw_value = _first_present(row, ["OBS_VALUE", "Observation value"])
+        country_code = _country_code_from_row(row)
+        raw_year = row.get("date")
+        raw_value = row.get("value")
 
-        if not country_code or time_period != str(base_year) or raw_value is None:
-            continue
-
-        api_country_code = country_code.strip()
-        output_country_code = OUTPUT_COUNTRY_CODES.get(api_country_code)
-        if output_country_code not in G20_COUNTRIES:
+        if country_code not in G20_COUNTRIES or raw_year is None or raw_value is None:
             continue
 
         try:
-            values_by_country[output_country_code] = float(raw_value)
-        except ValueError:
+            year = int(str(raw_year))
+            value = float(raw_value)
+        except (TypeError, ValueError):
             continue
 
-    missing = [country for country in G20_COUNTRIES if country not in values_by_country]
-    if missing:
-        raise ValueError(
-            "OECD response missing required countries: " + ", ".join(missing)
+        values_by_year.setdefault(year, {})[country_code] = value
+
+    return values_by_year
+
+
+def _latest_complete_year(values_by_year: dict[int, dict[str, float]]) -> int:
+    required = set(G20_COUNTRIES)
+    for year in sorted(values_by_year.keys(), reverse=True):
+        if required.issubset(values_by_year[year].keys()):
+            return year
+
+    if values_by_year:
+        latest_year = max(values_by_year)
+        missing = sorted(required - set(values_by_year[latest_year].keys()))
+        raise DataUnavailableError(
+            f"No complete G20 price-level year found. Latest year {latest_year} "
+            f"is missing: {', '.join(missing)}"
         )
 
-    korea_value = values_by_country.get("KOR")
-    if korea_value is None:
-        raise ValueError("OECD response did not include Korea CPI data")
+    raise DataUnavailableError("World Bank API returned no usable observations")
 
-    korea_growth_factor = 100 + korea_value
+
+def fetch_world_bank_price_levels(
+    *,
+    end_year: int | None = None,
+    lookback_years: int = LATEST_LOOKBACK_YEARS,
+) -> tuple[list[dict[str, object]], int]:
+    """Fetch latest complete G20 price-level ratios and rebase Korea to 100."""
+    current_year = datetime.now(timezone.utc).year
+    end_year = end_year or current_year
+    start_year = end_year - lookback_years
+    rows = _read_world_bank_json(_build_world_bank_url(start_year, end_year))
+    values_by_year = _extract_price_level_rows(rows)
+    base_year = _latest_complete_year(values_by_year)
+    values = values_by_year[base_year]
+    korea_value = values.get("KOR")
+
+    if korea_value is None or korea_value <= 0:
+        raise DataUnavailableError(f"Korea value is missing for {base_year}")
+
     data = [
         {
             "countryCode": country_code,
             "countryName": COUNTRY_NAMES[country_code],
-            "indexValue": (
-                100.0
-                if country_code == "KOR"
-                else round(
-                    ((100 + values_by_country[country_code]) / korea_growth_factor)
-                    * 100,
-                    2,
-                )
-            ),
+            "indexValue": 100.0
+            if country_code == "KOR"
+            else round((values[country_code] / korea_value) * 100, 2),
             "baseYear": base_year,
-            "source": "OECD",
-            "isSampleBacked": False,
-            "sourceDetail": SOURCE_DETAIL_OECD,
+            "source": SOURCE,
+            "sourceDetail": SOURCE_DETAIL,
+            "rawPriceLevelRatio": round(values[country_code], 6),
         }
         for country_code in G20_COUNTRIES
     ]
-    return sorted(data, key=lambda item: float(item["indexValue"]), reverse=True), []
+    return sorted(data, key=lambda item: float(item["indexValue"]), reverse=True), base_year
 
 
-def _refresh_metadata(
-    data: list[dict[str, object]],
-    missing_oecd_countries: list[str],
-) -> dict[str, object]:
-    expected_country_count = len(G20_COUNTRIES)
-    sample_backed_country_count = sum(
-        1
-        for item in data
-        if item.get("isSampleBacked") is True or item.get("source") == "sample"
-    )
-    oecd_country_count = sum(
-        1
-        for item in data
-        if item.get("source") == "OECD" and item.get("isSampleBacked") is not True
-    )
+def build_snapshot_price_levels() -> tuple[list[dict[str, object]], int]:
+    """Build from the checked-in latest WDI snapshot when the API is unavailable."""
+    base_year = 2024
+    korea_value = WORLD_BANK_2024_SNAPSHOT["KOR"]
+    data = [
+        {
+            "countryCode": country_code,
+            "countryName": COUNTRY_NAMES[country_code],
+            "indexValue": 100.0
+            if country_code == "KOR"
+            else round((WORLD_BANK_2024_SNAPSHOT[country_code] / korea_value) * 100, 2),
+            "baseYear": base_year,
+            "source": SOURCE,
+            "sourceDetail": SOURCE_DETAIL,
+            "rawPriceLevelRatio": WORLD_BANK_2024_SNAPSHOT[country_code],
+        }
+        for country_code in G20_COUNTRIES
+    ]
+    return sorted(data, key=lambda item: float(item["indexValue"]), reverse=True), base_year
 
+
+def _refresh_metadata(data: list[dict[str, object]], *, is_api_fallback: bool) -> dict[str, object]:
     return {
-        "expectedCountryCount": expected_country_count,
-        "oecdCountryCount": oecd_country_count,
-        "sampleBackedCountryCount": sample_backed_country_count,
-        "missingOecdCountries": missing_oecd_countries,
-        "hasIncompleteOecdPull": (
-            bool(missing_oecd_countries) or oecd_country_count < expected_country_count
-        ),
-        "isFallback": sample_backed_country_count > 0,
+        "expectedCountryCount": len(G20_COUNTRIES),
+        "officialCountryCount": len(data),
+        "missingCountries": [],
+        "hasIncompleteOfficialPull": len(data) != len(G20_COUNTRIES),
+        "isFallback": is_api_fallback,
+        "fallbackReason": "World Bank API unavailable; using latest checked-in WDI snapshot"
+        if is_api_fallback
+        else None,
     }
 
 
@@ -197,24 +263,26 @@ def save_to_json(
     data: list[dict[str, object]],
     output_dir: str = "public/data",
     *,
-    base_year: int = 2021,
-    source: str = "OECD SDMX API",
-    dataset_type: str = "CPI_ANNUAL_RATE",
-    missing_oecd_countries: list[str] | None = None,
+    base_year: int,
+    is_api_fallback: bool = False,
 ) -> Path:
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     filename = output_path / "k-collusion-index.json"
-    refresh_metadata = _refresh_metadata(data, missing_oecd_countries or [])
 
     payload = {
         "success": True,
         "data": data,
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "baseYear": base_year,
-        "source": source,
-        "datasetType": dataset_type,
-        **refresh_metadata,
+        "source": SOURCE,
+        "sourceUrl": "https://data.worldbank.org/indicator/PA.NUS.PPPC.RF",
+        "snapshotUrl": "https://macrovedia.com/series/93bfb1f66cb554dc/",
+        "indicatorCode": WORLD_BANK_PRICE_LEVEL_INDICATOR,
+        "indicatorName": WORLD_BANK_PRICE_LEVEL_NAME,
+        "datasetType": DATASET_TYPE,
+        "methodology": "World Bank price level ratio rebased so Korea equals 100",
+        **_refresh_metadata(data, is_api_fallback=is_api_fallback),
     }
 
     with filename.open("w", encoding="utf-8") as file:
@@ -225,19 +293,16 @@ def save_to_json(
 
 
 def main() -> None:
-    print("Generating K-Collusion Index data")
-    base_year = 2021
-    source = "OECD SDMX API"
-    dataset_type = "CPI_ANNUAL_RATE"
-    data, missing = fetch_oecd_cpi_index(base_year=base_year)
+    print("Generating K-Collusion Index price-level data")
+    try:
+        data, base_year = fetch_world_bank_price_levels()
+        is_api_fallback = False
+    except (HTTPError, URLError, TimeoutError, DataUnavailableError, OSError) as exc:
+        print(f"World Bank API fetch failed, using checked-in WDI snapshot: {exc}")
+        data, base_year = build_snapshot_price_levels()
+        is_api_fallback = True
 
-    filename = save_to_json(
-        data,
-        base_year=base_year,
-        source=source,
-        dataset_type=dataset_type,
-        missing_oecd_countries=missing,
-    )
+    filename = save_to_json(data, base_year=base_year, is_api_fallback=is_api_fallback)
     print(f"Wrote {filename}")
     for rank, item in enumerate(data[:5], 1):
         print(f"{rank}. {item['countryName']}: {item['indexValue']}")

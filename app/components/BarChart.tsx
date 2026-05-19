@@ -53,7 +53,7 @@ export default function BarChart({ data }: BarChartProps) {
           <Tooltip
             formatter={(value) => [
               typeof value === "number" ? value.toFixed(1) : value,
-              "Index",
+              "지수",
             ]}
             labelStyle={{ color: "#f1f5f9", fontWeight: 700 }}
             contentStyle={{
@@ -68,7 +68,7 @@ export default function BarChart({ data }: BarChartProps) {
             x={100}
             stroke="#f87171"
             strokeDasharray="4 4"
-            label={{ value: "Korea 100", fill: "#f87171", fontSize: 12 }}
+            label={{ value: "한국 100", fill: "#f87171", fontSize: 12 }}
           />
           <Bar dataKey="value" name="K-Collusion Index" radius={[0, 4, 4, 0]}>
             <LabelList
@@ -83,13 +83,7 @@ export default function BarChart({ data }: BarChartProps) {
             {data.map((entry) => (
               <Cell
                 key={entry.countryCode}
-                fill={
-                  entry.countryCode === "KOR"
-                    ? "#8b5cf6"
-                    : entry.isSampleBacked
-                      ? "#d97706"
-                      : "#3b82f6"
-                }
+                fill={entry.countryCode === "KOR" ? "#8b5cf6" : "#3b82f6"}
               />
             ))}
           </Bar>

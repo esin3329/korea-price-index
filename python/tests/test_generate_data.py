@@ -9,74 +9,77 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import generate_data
 
 
-def _oecd_rows(missing: set[str] | None = None) -> list[dict[str, str]]:
+def _world_bank_rows(missing: set[str] | None = None) -> list[dict[str, object]]:
     missing = missing or set()
     rows = []
     for index, country_code in enumerate(generate_data.G20_COUNTRIES, start=1):
         if country_code in missing:
             continue
 
-        api_country_code = generate_data.OECD_COUNTRY_ALIASES.get(
-            country_code,
-            country_code,
-        )
-        value = "2.5" if country_code == "KOR" else str(2 + index / 10)
+        api_country_code = country_code
+        value = 0.75 if country_code == "KOR" else 0.55 + index / 100
         rows.append(
             {
-                "REF_AREA": api_country_code,
-                "TIME_PERIOD": "2021",
-                "OBS_VALUE": value,
+                "country": {"id": api_country_code, "value": country_code},
+                "countryiso3code": api_country_code,
+                "date": "2024",
+                "value": value,
             }
         )
     return rows
 
 
-def test_partial_oecd_response_raises_instead_of_using_sample(monkeypatch):
+def test_partial_world_bank_response_raises(monkeypatch):
     monkeypatch.setattr(
         generate_data,
-        "_read_oecd_csv",
-        lambda _url: _oecd_rows({"GBR", "DEU", "FRA"}),
+        "_read_world_bank_json",
+        lambda _url: _world_bank_rows({"GBR", "DEU", "FRA"}),
     )
 
-    with pytest.raises(ValueError, match="OECD response missing required countries"):
-        generate_data.fetch_oecd_cpi_index(base_year=2021)
+    with pytest.raises(generate_data.DataUnavailableError, match="No complete G20"):
+        generate_data.fetch_world_bank_price_levels(end_year=2024)
 
 
-def test_full_oecd_response_has_no_fallback_metadata(monkeypatch, tmp_path):
-    monkeypatch.setattr(generate_data, "_read_oecd_csv", lambda _url: _oecd_rows())
-    data, missing_countries = generate_data.fetch_oecd_cpi_index(base_year=2021)
+def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        generate_data,
+        "_read_world_bank_json",
+        lambda _url: _world_bank_rows(),
+    )
+    data, base_year = generate_data.fetch_world_bank_price_levels(end_year=2024)
 
     filename = generate_data.save_to_json(
         data,
         output_dir=str(tmp_path),
-        base_year=2021,
-        source="OECD SDMX API",
-        dataset_type="CPI_ANNUAL_RATE",
-        missing_oecd_countries=missing_countries,
+        base_year=base_year,
     )
 
     payload = json.loads(filename.read_text(encoding="utf-8"))
     assert payload["expectedCountryCount"] == len(generate_data.G20_COUNTRIES)
-    assert payload["oecdCountryCount"] == len(generate_data.G20_COUNTRIES)
-    assert payload["sampleBackedCountryCount"] == 0
-    assert payload["missingOecdCountries"] == []
-    assert payload["hasIncompleteOecdPull"] is False
+    assert payload["officialCountryCount"] == len(generate_data.G20_COUNTRIES)
+    assert payload["missingCountries"] == []
+    assert payload["hasIncompleteOfficialPull"] is False
     assert payload["isFallback"] is False
-    assert payload["baseYear"] == 2021
-    assert payload["datasetType"] == "CPI_ANNUAL_RATE"
-    assert all(item["source"] == "OECD" for item in payload["data"])
-    assert all(item["isSampleBacked"] is False for item in payload["data"])
+    assert payload["baseYear"] == 2024
+    assert payload["datasetType"] == generate_data.DATASET_TYPE
+    assert payload["source"] == generate_data.SOURCE
+    assert payload["indicatorCode"] == generate_data.WORLD_BANK_PRICE_LEVEL_INDICATOR
+    assert all(item["source"] == generate_data.SOURCE for item in payload["data"])
     assert all(
-        item["sourceDetail"] == generate_data.SOURCE_DETAIL_OECD
+        item["sourceDetail"] == generate_data.SOURCE_DETAIL
         for item in payload["data"]
     )
 
+    korea = next(item for item in payload["data"] if item["countryCode"] == "KOR")
+    assert korea["indexValue"] == 100.0
 
-def test_oecd_country_aliases_are_mapped_back_to_dashboard_codes(monkeypatch):
-    monkeypatch.setattr(generate_data, "_read_oecd_csv", lambda _url: _oecd_rows())
 
-    data, _missing_countries = generate_data.fetch_oecd_cpi_index(base_year=2021)
+def test_snapshot_builds_latest_official_price_level_data():
+    data, base_year = generate_data.build_snapshot_price_levels()
 
-    country_codes = {item["countryCode"] for item in data}
-    assert "EU27" in country_codes
-    assert "EU27_2020" not in country_codes
+    assert base_year == 2024
+    assert len(data) == len(generate_data.G20_COUNTRIES)
+    assert {item["countryCode"] for item in data} == set(generate_data.G20_COUNTRIES)
+    assert next(item for item in data if item["countryCode"] == "KOR")[
+        "indexValue"
+    ] == 100.0

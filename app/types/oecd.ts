@@ -18,19 +18,18 @@ export const G20_COUNTRIES = [
   "TUR",
   "GBR",
   "USA",
-  "EU27",
 ] as const;
 
 export type G20CountryCode = (typeof G20_COUNTRIES)[number];
 
-export const BASE_YEAR = 2021;
+export const BASE_YEAR = 2024;
 
-export interface OECDDataItem {
+export interface PriceLevelDataItem {
   countryCode: G20CountryCode;
   countryName: string;
   year: number;
   value: number;
-  datasetType: "CPI" | "PPP";
+  datasetType: "PRICE_LEVEL_RATIO";
 }
 
 export interface KCollusionIndex {
@@ -38,9 +37,9 @@ export interface KCollusionIndex {
   countryName: string;
   indexValue: number;
   baseYear: number;
-  source: "OECD" | "sample";
-  isSampleBacked: boolean;
+  source: string;
   sourceDetail: string;
+  rawPriceLevelRatio: number;
 }
 
 export interface ChartDataItem {
@@ -48,9 +47,9 @@ export interface ChartDataItem {
   value: number;
   rank: number;
   countryCode: G20CountryCode;
-  source: "OECD" | "sample";
-  isSampleBacked: boolean;
+  source: string;
   sourceDetail: string;
+  rawPriceLevelRatio: number;
 }
 
 export interface APIResponse<T> {
@@ -80,5 +79,4 @@ export const COUNTRY_NAMES: Record<G20CountryCode, string> = {
   TUR: "튀르키예",
   GBR: "영국",
   USA: "미국",
-  EU27: "유럽연합",
 };

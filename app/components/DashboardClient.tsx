@@ -15,13 +15,16 @@ type DataFile = {
   timestamp?: string;
   baseYear?: number;
   source?: string;
+  sourceUrl?: string;
+  indicatorCode?: string;
+  indicatorName?: string;
   datasetType?: string;
-  isFallback?: boolean;
+  methodology?: string;
   expectedCountryCount?: number;
-  oecdCountryCount?: number;
-  sampleBackedCountryCount?: number;
-  missingOecdCountries?: string[];
-  hasIncompleteOecdPull?: boolean;
+  officialCountryCount?: number;
+  missingCountries?: string[];
+  hasIncompleteOfficialPull?: boolean;
+  isFallback?: boolean;
 };
 
 type LoadedDataFile = DataFile & {
@@ -31,13 +34,16 @@ type LoadedDataFile = DataFile & {
 type RefreshMetadata = Pick<
   DataFile,
   | "source"
+  | "sourceUrl"
+  | "indicatorCode"
+  | "indicatorName"
   | "datasetType"
-  | "isFallback"
+  | "methodology"
   | "expectedCountryCount"
-  | "oecdCountryCount"
-  | "sampleBackedCountryCount"
-  | "missingOecdCountries"
-  | "hasIncompleteOecdPull"
+  | "officialCountryCount"
+  | "missingCountries"
+  | "hasIncompleteOfficialPull"
+  | "isFallback"
 >;
 
 async function loadIndexData(): Promise<LoadedDataFile> {
@@ -61,13 +67,16 @@ async function loadIndexData(): Promise<LoadedDataFile> {
 function getRefreshMetadata(json: LoadedDataFile): RefreshMetadata {
   return {
     source: json.source,
+    sourceUrl: json.sourceUrl,
+    indicatorCode: json.indicatorCode,
+    indicatorName: json.indicatorName,
     datasetType: json.datasetType,
-    isFallback: json.isFallback,
+    methodology: json.methodology,
     expectedCountryCount: json.expectedCountryCount,
-    oecdCountryCount: json.oecdCountryCount,
-    sampleBackedCountryCount: json.sampleBackedCountryCount,
-    missingOecdCountries: json.missingOecdCountries,
-    hasIncompleteOecdPull: json.hasIncompleteOecdPull,
+    officialCountryCount: json.officialCountryCount,
+    missingCountries: json.missingCountries,
+    hasIncompleteOfficialPull: json.hasIncompleteOfficialPull,
+    isFallback: json.isFallback,
   };
 }
 
@@ -76,18 +85,23 @@ export default function DashboardClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [baseYear, setBaseYear] = useState<number | null>(null);
   const [refreshMetadata, setRefreshMetadata] =
     useState<RefreshMetadata | null>(null);
+
+  const applyLoadedData = (json: LoadedDataFile) => {
+    setData(json.data);
+    setLastUpdated(json.timestamp || null);
+    setBaseYear(json.baseYear || null);
+    setRefreshMetadata(getRefreshMetadata(json));
+  };
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const json = await loadIndexData();
-      setData(json.data);
-      setLastUpdated(json.timestamp || null);
-      setRefreshMetadata(getRefreshMetadata(json));
+      applyLoadedData(await loadIndexData());
     } catch (err) {
       setError(
         err instanceof Error
@@ -106,23 +120,17 @@ export default function DashboardClient() {
       try {
         const json = await loadIndexData();
 
-        if (cancelled) {
-          return;
+        if (!cancelled) {
+          applyLoadedData(json);
         }
-
-        setData(json.data);
-        setLastUpdated(json.timestamp || null);
-        setRefreshMetadata(getRefreshMetadata(json));
       } catch (err) {
-        if (cancelled) {
-          return;
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "데이터를 불러오는 과정에서 오류가 발생했습니다.",
+          );
         }
-
-        setError(
-          err instanceof Error
-            ? err.message
-            : "데이터를 불러오는 과정에서 오류가 발생했습니다.",
-        );
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -147,8 +155,8 @@ export default function DashboardClient() {
           rank: index + 1,
           countryCode: item.countryCode,
           source: item.source,
-          isSampleBacked: item.isSampleBacked,
           sourceDetail: item.sourceDetail,
+          rawPriceLevelRatio: item.rawPriceLevelRatio,
         })),
     [data],
   );
@@ -171,18 +179,17 @@ export default function DashboardClient() {
         )
       : null;
   const shouldShowQualityNotice =
-    refreshMetadata?.hasIncompleteOecdPull === true ||
+    refreshMetadata?.hasIncompleteOfficialPull === true ||
     refreshMetadata?.isFallback === true;
-  const sampleBackedCount = refreshMetadata?.sampleBackedCountryCount || 0;
-  const missingCountries = refreshMetadata?.missingOecdCountries || [];
+  const missingCountries = refreshMetadata?.missingCountries || [];
 
   const downloadCsv = () => {
     const csvHeader =
-      "countryCode,countryName,indexValue,baseYear,source,isSampleBacked,sourceDetail\n";
+      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio\n";
     const csvRows = data
       .map(
         (item) =>
-          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},${item.source},${item.isSampleBacked},${item.sourceDetail}`,
+          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio}`,
       )
       .join("\n");
     const blob = new Blob([csvHeader + csvRows], {
@@ -209,11 +216,11 @@ export default function DashboardClient() {
       <section className={styles.intro}>
         <div>
           <p className={styles.eyebrow}>Korea baseline: 100</p>
-          <h2 className={styles.title}>한국 물가 국제 비교</h2>
+          <h2 className={styles.title}>한국 기준 국제 물가 수준 비교</h2>
           <p className={styles.description}>
-            대한민국을 기준값 100으로 두고 G20 주요 국가의 상대 물가 수준을
-            비교합니다. 숫자가 높을수록 한국보다 물가 부담이 큰 것으로
-            해석합니다.
+            World Bank WDI의 PPP 기반 물가수준 비율을 사용해 G20 주요 국가의
+            상대적인 가격 수준을 비교합니다. 대한민국을 100으로 다시 기준화했기
+            때문에 숫자가 높을수록 한국보다 전반적인 물가 수준이 높다는 뜻입니다.
           </p>
         </div>
         <div className={styles.refreshStatus}>
@@ -222,12 +229,26 @@ export default function DashboardClient() {
               마지막 업데이트 {new Date(lastUpdated).toLocaleString("ko-KR")}
             </p>
           )}
+          {baseYear && (
+            <p className={styles.updated}>기준 연도 {baseYear}</p>
+          )}
+          {refreshMetadata?.source && (
+            <p className={styles.sourceLine}>
+              출처 {refreshMetadata.source}
+              {refreshMetadata.indicatorCode
+                ? ` · ${refreshMetadata.indicatorCode}`
+                : ""}
+            </p>
+          )}
           {shouldShowQualityNotice && (
             <p className={styles.qualityNotice} role="status">
-              샘플 기반 행: {sampleBackedCount}
-              {missingCountries.length > 0
-                ? ` (${missingCountries.join(", ")})`
-                : ""}
+              {refreshMetadata?.hasIncompleteOfficialPull
+                ? `공식 데이터 누락${
+                    missingCountries.length > 0
+                      ? ` (${missingCountries.join(", ")})`
+                      : ""
+                  }`
+                : "World Bank API 대신 최신 WDI 스냅샷 사용"}
             </p>
           )}
         </div>
@@ -240,7 +261,7 @@ export default function DashboardClient() {
         />
         <MetricCard label="평균 지수" value={avgIndex.toFixed(1)} />
         <MetricCard
-          label="최고 물가"
+          label="가장 높은 물가 수준"
           value={
             highestCountry
               ? `${highestCountry.countryName} ${highestCountry.indexValue.toFixed(1)}`
@@ -248,7 +269,7 @@ export default function DashboardClient() {
           }
         />
         <MetricCard
-          label="최저 물가"
+          label="가장 낮은 물가 수준"
           value={
             lowestCountry
               ? `${lowestCountry.countryName} ${lowestCountry.indexValue.toFixed(1)}`
@@ -259,8 +280,8 @@ export default function DashboardClient() {
 
       <section className={styles.panel}>
         <div className={styles.sectionHeader}>
-          <h3>물가 지수 비교</h3>
-          <p>국가명을 바로 읽을 수 있도록 가로 막대로 정렬했습니다.</p>
+          <h3>물가 수준 지수 비교</h3>
+          <p>PPP 기반 가격수준 비율을 한국 기준 100으로 재산정했습니다.</p>
         </div>
         <BarChart data={chartData} />
       </section>
