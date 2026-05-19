@@ -309,7 +309,7 @@ export default function DashboardClient() {
           }
         />
         <MetricCard
-          label={`${refreshMetadata?.consumerInflationYear || 2024} CPI 상승률`}
+          label={`${refreshMetadata?.consumerInflationYear || 2026} CPI 전망`}
           value={`${avgConsumerInflation.toFixed(1)}%`}
         />
       </section>

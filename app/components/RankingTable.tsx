@@ -24,7 +24,7 @@ export default function RankingTable({ data }: RankingTableProps) {
               한국 대비
             </th>
             <th scope="col" className={styles.numeric}>
-              최신 CPI 상승률
+              2026 CPI 전망
             </th>
           </tr>
         </thead>
