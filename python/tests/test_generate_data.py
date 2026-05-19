@@ -93,6 +93,8 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
     assert payload["indicatorCode"] == generate_data.WORLD_BANK_PRICE_LEVEL_INDICATOR
     assert payload["consumerInflationYear"] == 2026
     assert payload["consumerInflationIndicatorCode"] == "PCPIPCH"
+    assert payload["consumerInflationVintage"] == "April 2026"
+    assert payload["consumerInflationPublicationDate"] == "2026-04-14"
     assert payload["consumerInflationIsForecast"] is True
     assert payload["latestCpiInflationYear"] == 2024
     assert payload["latestCpiInflationIndicatorCode"] == "FP.CPI.TOTL.ZG"
@@ -109,6 +111,8 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
     korea = next(item for item in payload["data"] if item["countryCode"] == "KOR")
     assert korea["indexValue"] == 100.0
     assert korea["consumerInflationRate"] == 2.5
+    assert korea["consumerInflationVintage"] == "April 2026"
+    assert korea["consumerInflationPublicationDate"] == "2026-04-14"
     assert korea["consumerInflationIsForecast"] is True
     assert korea["latestCpiInflationRate"] == 2.3
     assert korea["latestCpiInflationYear"] == 2024

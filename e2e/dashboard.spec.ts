@@ -12,6 +12,8 @@ type IndexDataItem = {
   consumerInflationYear: number;
   consumerInflationSource: string;
   consumerInflationSourceDetail: string;
+  consumerInflationVintage: string;
+  consumerInflationPublicationDate: string;
   consumerInflationIsForecast: boolean;
   latestCpiInflationRate: number;
   latestCpiInflationYear: number;
@@ -75,8 +77,12 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(json.source).toBe("World Bank WDI");
     expect(json.indicatorCode).toBe("PA.NUS.PPPC.RF");
     expect(json.consumerInflationYear).toBe(2026);
-    expect(json.consumerInflationSource).toBe("IMF World Economic Outlook");
+    expect(json.consumerInflationSource).toBe(
+      "IMF World Economic Outlook (April 2026)",
+    );
     expect(json.consumerInflationIndicatorCode).toBe("PCPIPCH");
+    expect(json.consumerInflationVintage).toBe("April 2026");
+    expect(json.consumerInflationPublicationDate).toBe("2026-04-14");
     expect(json.consumerInflationIsForecast).toBe(true);
     expect(json.latestCpiInflationYear).toBe(2024);
     expect(json.latestCpiInflationSource).toBe("World Bank WDI");
@@ -95,8 +101,12 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(firstItem.rawPriceLevelRatio).toEqual(expect.any(Number));
     expect(firstItem.consumerInflationRate).toEqual(expect.any(Number));
     expect(firstItem.consumerInflationYear).toBe(2026);
-    expect(firstItem.consumerInflationSource).toBe("IMF World Economic Outlook");
+    expect(firstItem.consumerInflationSource).toBe(
+      "IMF World Economic Outlook (April 2026)",
+    );
     expect(firstItem.consumerInflationSourceDetail).toBe("imf_weo:PCPIPCH");
+    expect(firstItem.consumerInflationVintage).toBe("April 2026");
+    expect(firstItem.consumerInflationPublicationDate).toBe("2026-04-14");
     expect(firstItem.consumerInflationIsForecast).toBe(true);
     expect(firstItem.latestCpiInflationRate).toEqual(expect.any(Number));
     expect(firstItem.latestCpiInflationYear).toBe(2024);

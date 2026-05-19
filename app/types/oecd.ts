@@ -44,6 +44,8 @@ export interface KCollusionIndex {
   consumerInflationYear: number;
   consumerInflationSource: string;
   consumerInflationSourceDetail: string;
+  consumerInflationVintage: string;
+  consumerInflationPublicationDate: string;
   consumerInflationIsForecast: boolean;
   latestCpiInflationRate: number;
   latestCpiInflationYear: number;

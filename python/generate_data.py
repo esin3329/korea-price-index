@@ -80,9 +80,17 @@ SOURCE_DETAIL = f"world_bank_wdi:{WORLD_BANK_PRICE_LEVEL_INDICATOR}"
 IMF_CONSUMER_INFLATION_INDICATOR = "PCPIPCH"
 IMF_CONSUMER_INFLATION_NAME = "Inflation, average consumer prices"
 IMF_CONSUMER_INFLATION_YEAR = 2026
-IMF_CONSUMER_INFLATION_SOURCE = "IMF World Economic Outlook"
+IMF_CONSUMER_INFLATION_VINTAGE = "April 2026"
+IMF_CONSUMER_INFLATION_PUBLICATION_DATE = "2026-04-14"
+IMF_CONSUMER_INFLATION_SOURCE = (
+    f"IMF World Economic Outlook ({IMF_CONSUMER_INFLATION_VINTAGE})"
+)
 IMF_CONSUMER_INFLATION_SOURCE_DETAIL = (
     f"imf_weo:{IMF_CONSUMER_INFLATION_INDICATOR}"
+)
+IMF_CONSUMER_INFLATION_SOURCE_URL = (
+    "https://www.imf.org/en/publications/weo/issues/2026/04/14/"
+    "world-economic-outlook-april-2026"
 )
 IMF_DATAMAPPER_API_BASE = "https://www.imf.org/external/datamapper/api/v1"
 WORLD_BANK_LATEST_CPI_INFLATION_INDICATOR = "FP.CPI.TOTL.ZG"
@@ -578,6 +586,10 @@ def _enrich_with_consumer_inflation(
                 "consumerInflationYear": IMF_CONSUMER_INFLATION_YEAR,
                 "consumerInflationSource": IMF_CONSUMER_INFLATION_SOURCE,
                 "consumerInflationSourceDetail": IMF_CONSUMER_INFLATION_SOURCE_DETAIL,
+                "consumerInflationVintage": IMF_CONSUMER_INFLATION_VINTAGE,
+                "consumerInflationPublicationDate": (
+                    IMF_CONSUMER_INFLATION_PUBLICATION_DATE
+                ),
                 "consumerInflationIsForecast": True,
                 "latestCpiInflationRate": latest_cpi[country_code],
                 "latestCpiInflationYear": latest_cpi_year,
@@ -617,14 +629,15 @@ def _refresh_metadata(
         else None,
         "consumerInflationYear": consumer_inflation_year,
         "consumerInflationSource": IMF_CONSUMER_INFLATION_SOURCE,
-        "consumerInflationSourceUrl": (
-            "https://data.imf.org/Datasets/WEO"
-        ),
+        "consumerInflationSourceUrl": IMF_CONSUMER_INFLATION_SOURCE_URL,
         "consumerInflationIndicatorCode": IMF_CONSUMER_INFLATION_INDICATOR,
         "consumerInflationIndicatorName": IMF_CONSUMER_INFLATION_NAME,
+        "consumerInflationVintage": IMF_CONSUMER_INFLATION_VINTAGE,
+        "consumerInflationPublicationDate": IMF_CONSUMER_INFLATION_PUBLICATION_DATE,
         "consumerInflationMethodology": (
-            "IMF WEO annual average consumer price inflation, percent change; "
-            "used as forecast trend context and not as a price-level index"
+            "IMF WEO April 2026 annual average consumer price inflation, "
+            "percent change; used as forecast trend context and not as a "
+            "price-level index"
         ),
         "consumerInflationIsForecast": True,
         "consumerInflationIsFallback": is_forecast_fallback,

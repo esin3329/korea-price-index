@@ -30,6 +30,8 @@ type DataFile = {
   consumerInflationSourceUrl?: string;
   consumerInflationIndicatorCode?: string;
   consumerInflationIndicatorName?: string;
+  consumerInflationVintage?: string;
+  consumerInflationPublicationDate?: string;
   consumerInflationMethodology?: string;
   consumerInflationIsForecast?: boolean;
   consumerInflationIsFallback?: boolean;
@@ -64,6 +66,8 @@ type RefreshMetadata = Pick<
   | "consumerInflationSourceUrl"
   | "consumerInflationIndicatorCode"
   | "consumerInflationIndicatorName"
+  | "consumerInflationVintage"
+  | "consumerInflationPublicationDate"
   | "consumerInflationMethodology"
   | "consumerInflationIsForecast"
   | "consumerInflationIsFallback"
@@ -112,6 +116,8 @@ function getRefreshMetadata(json: LoadedDataFile): RefreshMetadata {
     consumerInflationSourceUrl: json.consumerInflationSourceUrl,
     consumerInflationIndicatorCode: json.consumerInflationIndicatorCode,
     consumerInflationIndicatorName: json.consumerInflationIndicatorName,
+    consumerInflationVintage: json.consumerInflationVintage,
+    consumerInflationPublicationDate: json.consumerInflationPublicationDate,
     consumerInflationMethodology: json.consumerInflationMethodology,
     consumerInflationIsForecast: json.consumerInflationIsForecast,
     consumerInflationIsFallback: json.consumerInflationIsFallback,
@@ -245,11 +251,11 @@ export default function DashboardClient() {
 
   const downloadCsv = () => {
     const csvHeader =
-      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio,consumerInflationRate,consumerInflationYear,consumerInflationSource,consumerInflationSourceDetail,consumerInflationIsForecast,latestCpiInflationRate,latestCpiInflationYear,latestCpiInflationSource,latestCpiInflationSourceDetail\n";
+      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio,consumerInflationRate,consumerInflationYear,consumerInflationSource,consumerInflationSourceDetail,consumerInflationVintage,consumerInflationPublicationDate,consumerInflationIsForecast,latestCpiInflationRate,latestCpiInflationYear,latestCpiInflationSource,latestCpiInflationSourceDetail\n";
     const csvRows = data
       .map(
         (item) =>
-          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio},${item.consumerInflationRate},${item.consumerInflationYear},"${item.consumerInflationSource}","${item.consumerInflationSourceDetail}",${item.consumerInflationIsForecast},${item.latestCpiInflationRate},${item.latestCpiInflationYear},"${item.latestCpiInflationSource}","${item.latestCpiInflationSourceDetail}"`,
+          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio},${item.consumerInflationRate},${item.consumerInflationYear},"${item.consumerInflationSource}","${item.consumerInflationSourceDetail}","${item.consumerInflationVintage}","${item.consumerInflationPublicationDate}",${item.consumerInflationIsForecast},${item.latestCpiInflationRate},${item.latestCpiInflationYear},"${item.latestCpiInflationSource}","${item.latestCpiInflationSourceDetail}"`,
       )
       .join("\n");
     const blob = new Blob([csvHeader + csvRows], {
