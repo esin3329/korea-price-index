@@ -2,7 +2,9 @@
 
 The dashboard compares cross-country price levels, not inflation rates. It uses
 World Bank WDI's PPP-based price level ratio indicator and rebases every country
-against Korea so that KOR is always 100.
+against Korea so that KOR is always 100. Consumer inflation is included only as
+supplementary trend context because it is a change rate, not a cross-country
+price-level measure.
 """
 
 from __future__ import annotations
@@ -73,6 +75,14 @@ WORLD_BANK_PRICE_LEVEL_NAME = (
 DATASET_TYPE = "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE"
 SOURCE = "World Bank WDI"
 SOURCE_DETAIL = f"world_bank_wdi:{WORLD_BANK_PRICE_LEVEL_INDICATOR}"
+IMF_CONSUMER_INFLATION_INDICATOR = "PCPIPCH"
+IMF_CONSUMER_INFLATION_NAME = "Inflation, average consumer prices"
+IMF_CONSUMER_INFLATION_YEAR = 2026
+IMF_CONSUMER_INFLATION_SOURCE = "IMF World Economic Outlook"
+IMF_CONSUMER_INFLATION_SOURCE_DETAIL = (
+    f"imf_weo:{IMF_CONSUMER_INFLATION_INDICATOR}"
+)
+IMF_DATAMAPPER_API_BASE = "https://www.imf.org/external/datamapper/api/v1"
 AUTARIO_WORLD_BANK_DATASET_API = (
     "https://autario.com/api/v1/public/datasets/"
     "3b933e66-0321-4ae3-adcb-ff352bfb00f0/data"
@@ -101,9 +111,35 @@ WORLD_BANK_2024_SNAPSHOT = {
     "USA": 1.00,
 }
 
+IMF_2026_CONSUMER_INFLATION_SNAPSHOT = {
+    "ARG": 30.4,
+    "AUS": 4.0,
+    "BRA": 4.0,
+    "CAN": 2.5,
+    "CHN": 1.2,
+    "FRA": 1.8,
+    "DEU": 2.7,
+    "IND": 4.7,
+    "IDN": 3.0,
+    "ITA": 2.6,
+    "JPN": 2.2,
+    "KOR": 2.5,
+    "MEX": 3.9,
+    "RUS": 5.6,
+    "SAU": 2.3,
+    "ZAF": 3.9,
+    "TUR": 28.6,
+    "GBR": 3.2,
+    "USA": 3.2,
+}
+
 
 class DataUnavailableError(RuntimeError):
     """Raised when a complete official price-level dataset is unavailable."""
+
+
+class InflationDataUnavailableError(RuntimeError):
+    """Raised when complete IMF consumer inflation data is unavailable."""
 
 
 def _build_world_bank_url(
@@ -340,7 +376,96 @@ def build_snapshot_price_levels() -> tuple[list[dict[str, object]], int]:
     return sorted(data, key=lambda item: float(item["indexValue"]), reverse=True), base_year
 
 
-def _refresh_metadata(data: list[dict[str, object]], *, is_api_fallback: bool) -> dict[str, object]:
+def _build_imf_datamapper_url(year: int = IMF_CONSUMER_INFLATION_YEAR) -> str:
+    countries = "/".join(G20_COUNTRIES)
+    return (
+        f"{IMF_DATAMAPPER_API_BASE}/{IMF_CONSUMER_INFLATION_INDICATOR}/"
+        f"{countries}?periods={year}"
+    )
+
+
+def _read_imf_consumer_inflation(
+    year: int = IMF_CONSUMER_INFLATION_YEAR,
+) -> dict[str, float]:
+    request = Request(
+        _build_imf_datamapper_url(year),
+        headers={"User-Agent": "curl/8.0.0"},
+    )
+    with urlopen(request, timeout=20) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+
+    values = payload.get("values") if isinstance(payload, dict) else None
+    indicator_values = (
+        values.get(IMF_CONSUMER_INFLATION_INDICATOR)
+        if isinstance(values, dict)
+        else None
+    )
+    if not isinstance(indicator_values, dict):
+        raise InflationDataUnavailableError("IMF DataMapper returned no values")
+
+    inflation: dict[str, float] = {}
+    missing: list[str] = []
+    for country_code in G20_COUNTRIES:
+        country_values = indicator_values.get(country_code)
+        raw_value = (
+            country_values.get(str(year))
+            if isinstance(country_values, dict)
+            else None
+        )
+        if raw_value is None:
+            missing.append(country_code)
+            continue
+        inflation[country_code] = round(float(raw_value), 1)
+
+    if missing:
+        raise InflationDataUnavailableError(
+            f"IMF DataMapper missing {year} inflation values: {', '.join(missing)}"
+        )
+
+    return inflation
+
+
+def _enrich_with_consumer_inflation(
+    data: list[dict[str, object]],
+) -> tuple[list[dict[str, object]], bool]:
+    try:
+        inflation = _read_imf_consumer_inflation()
+        is_inflation_fallback = False
+    except (
+        HTTPError,
+        URLError,
+        TimeoutError,
+        InflationDataUnavailableError,
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+    ):
+        inflation = IMF_2026_CONSUMER_INFLATION_SNAPSHOT
+        is_inflation_fallback = True
+
+    enriched = []
+    for item in data:
+        country_code = str(item["countryCode"])
+        enriched.append(
+            {
+                **item,
+                "consumerInflationRate": inflation[country_code],
+                "consumerInflationYear": IMF_CONSUMER_INFLATION_YEAR,
+                "consumerInflationSource": IMF_CONSUMER_INFLATION_SOURCE,
+                "consumerInflationSourceDetail": IMF_CONSUMER_INFLATION_SOURCE_DETAIL,
+                "consumerInflationIsForecast": True,
+            }
+        )
+
+    return enriched, is_inflation_fallback
+
+
+def _refresh_metadata(
+    data: list[dict[str, object]],
+    *,
+    is_api_fallback: bool,
+    is_inflation_fallback: bool,
+) -> dict[str, object]:
     return {
         "expectedCountryCount": len(G20_COUNTRIES),
         "officialCountryCount": len(data),
@@ -350,6 +475,19 @@ def _refresh_metadata(data: list[dict[str, object]], *, is_api_fallback: bool) -
         "fallbackReason": "World Bank API unavailable; using latest checked-in WDI snapshot"
         if is_api_fallback
         else None,
+        "consumerInflationYear": IMF_CONSUMER_INFLATION_YEAR,
+        "consumerInflationSource": IMF_CONSUMER_INFLATION_SOURCE,
+        "consumerInflationSourceUrl": (
+            "https://data.imf.org/Datasets/WEO"
+        ),
+        "consumerInflationIndicatorCode": IMF_CONSUMER_INFLATION_INDICATOR,
+        "consumerInflationIndicatorName": IMF_CONSUMER_INFLATION_NAME,
+        "consumerInflationMethodology": (
+            "IMF WEO annual average consumer price inflation, percent change; "
+            "used as forecast trend context and not as a price-level index"
+        ),
+        "consumerInflationIsForecast": True,
+        "consumerInflationIsFallback": is_inflation_fallback,
     }
 
 
@@ -359,6 +497,7 @@ def save_to_json(
     *,
     base_year: int,
     is_api_fallback: bool = False,
+    is_inflation_fallback: bool = False,
 ) -> Path:
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -376,8 +515,15 @@ def save_to_json(
         "indicatorCode": WORLD_BANK_PRICE_LEVEL_INDICATOR,
         "indicatorName": WORLD_BANK_PRICE_LEVEL_NAME,
         "datasetType": DATASET_TYPE,
-        "methodology": "World Bank price level ratio rebased so Korea equals 100",
-        **_refresh_metadata(data, is_api_fallback=is_api_fallback),
+        "methodology": (
+            "World Bank GDP price level index rebased so Korea equals 100; "
+            "IMF WEO CPI inflation is supplementary trend context"
+        ),
+        **_refresh_metadata(
+            data,
+            is_api_fallback=is_api_fallback,
+            is_inflation_fallback=is_inflation_fallback,
+        ),
     }
 
     with filename.open("w", encoding="utf-8") as file:
@@ -399,7 +545,13 @@ def main(*, require_live: bool = False) -> None:
         data, base_year = build_snapshot_price_levels()
         is_api_fallback = True
 
-    filename = save_to_json(data, base_year=base_year, is_api_fallback=is_api_fallback)
+    data, is_inflation_fallback = _enrich_with_consumer_inflation(data)
+    filename = save_to_json(
+        data,
+        base_year=base_year,
+        is_api_fallback=is_api_fallback,
+        is_inflation_fallback=is_inflation_fallback,
+    )
     print(f"Wrote {filename}")
     for rank, item in enumerate(data[:5], 1):
         print(f"{rank}. {item['countryName']}: {item['indexValue']}")

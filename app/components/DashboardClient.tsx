@@ -25,6 +25,14 @@ type DataFile = {
   missingCountries?: string[];
   hasIncompleteOfficialPull?: boolean;
   isFallback?: boolean;
+  consumerInflationYear?: number;
+  consumerInflationSource?: string;
+  consumerInflationSourceUrl?: string;
+  consumerInflationIndicatorCode?: string;
+  consumerInflationIndicatorName?: string;
+  consumerInflationMethodology?: string;
+  consumerInflationIsForecast?: boolean;
+  consumerInflationIsFallback?: boolean;
 };
 
 type LoadedDataFile = DataFile & {
@@ -44,6 +52,14 @@ type RefreshMetadata = Pick<
   | "missingCountries"
   | "hasIncompleteOfficialPull"
   | "isFallback"
+  | "consumerInflationYear"
+  | "consumerInflationSource"
+  | "consumerInflationSourceUrl"
+  | "consumerInflationIndicatorCode"
+  | "consumerInflationIndicatorName"
+  | "consumerInflationMethodology"
+  | "consumerInflationIsForecast"
+  | "consumerInflationIsFallback"
 >;
 
 async function loadIndexData(): Promise<LoadedDataFile> {
@@ -77,6 +93,14 @@ function getRefreshMetadata(json: LoadedDataFile): RefreshMetadata {
     missingCountries: json.missingCountries,
     hasIncompleteOfficialPull: json.hasIncompleteOfficialPull,
     isFallback: json.isFallback,
+    consumerInflationYear: json.consumerInflationYear,
+    consumerInflationSource: json.consumerInflationSource,
+    consumerInflationSourceUrl: json.consumerInflationSourceUrl,
+    consumerInflationIndicatorCode: json.consumerInflationIndicatorCode,
+    consumerInflationIndicatorName: json.consumerInflationIndicatorName,
+    consumerInflationMethodology: json.consumerInflationMethodology,
+    consumerInflationIsForecast: json.consumerInflationIsForecast,
+    consumerInflationIsFallback: json.consumerInflationIsFallback,
   };
 }
 
@@ -157,6 +181,9 @@ export default function DashboardClient() {
           source: item.source,
           sourceDetail: item.sourceDetail,
           rawPriceLevelRatio: item.rawPriceLevelRatio,
+          consumerInflationRate: item.consumerInflationRate,
+          consumerInflationYear: item.consumerInflationYear,
+          consumerInflationIsForecast: item.consumerInflationIsForecast,
         })),
     [data],
   );
@@ -182,14 +209,19 @@ export default function DashboardClient() {
     refreshMetadata?.hasIncompleteOfficialPull === true ||
     refreshMetadata?.isFallback === true;
   const missingCountries = refreshMetadata?.missingCountries || [];
+  const avgConsumerInflation =
+    data.length > 0
+      ? data.reduce((sum, item) => sum + item.consumerInflationRate, 0) /
+        data.length
+      : 0;
 
   const downloadCsv = () => {
     const csvHeader =
-      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio\n";
+      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio,consumerInflationRate,consumerInflationYear,consumerInflationSource,consumerInflationSourceDetail,consumerInflationIsForecast\n";
     const csvRows = data
       .map(
         (item) =>
-          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio}`,
+          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio},${item.consumerInflationRate},${item.consumerInflationYear},"${item.consumerInflationSource}","${item.consumerInflationSourceDetail}",${item.consumerInflationIsForecast}`,
       )
       .join("\n");
     const blob = new Blob([csvHeader + csvRows], {
@@ -275,6 +307,10 @@ export default function DashboardClient() {
               ? `${lowestCountry.countryName} ${lowestCountry.indexValue.toFixed(1)}`
               : "-"
           }
+        />
+        <MetricCard
+          label={`${refreshMetadata?.consumerInflationYear || 2026} CPI 전망`}
+          value={`${avgConsumerInflation.toFixed(1)}%`}
         />
       </section>
 

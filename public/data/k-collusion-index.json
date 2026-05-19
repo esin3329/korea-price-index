@@ -8,7 +8,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 1.0
+      "rawPriceLevelRatio": 1.0,
+      "consumerInflationRate": 3.2,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "AUS",
@@ -17,7 +22,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.895894
+      "rawPriceLevelRatio": 0.895894,
+      "consumerInflationRate": 4.0,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "GBR",
@@ -26,7 +36,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.84885
+      "rawPriceLevelRatio": 0.84885,
+      "consumerInflationRate": 3.2,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "CAN",
@@ -35,7 +50,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.840153
+      "rawPriceLevelRatio": 0.840153,
+      "consumerInflationRate": 2.5,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "DEU",
@@ -44,7 +64,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.758599
+      "rawPriceLevelRatio": 0.758599,
+      "consumerInflationRate": 2.7,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "FRA",
@@ -53,7 +78,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.73736
+      "rawPriceLevelRatio": 0.73736,
+      "consumerInflationRate": 1.8,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "ITA",
@@ -62,7 +92,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.649025
+      "rawPriceLevelRatio": 0.649025,
+      "consumerInflationRate": 2.6,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "JPN",
@@ -71,7 +106,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.624066
+      "rawPriceLevelRatio": 0.624066,
+      "consumerInflationRate": 2.2,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "KOR",
@@ -80,7 +120,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.593576
+      "rawPriceLevelRatio": 0.593576,
+      "consumerInflationRate": 2.5,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "MEX",
@@ -89,7 +134,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.541745
+      "rawPriceLevelRatio": 0.541745,
+      "consumerInflationRate": 3.9,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "SAU",
@@ -98,7 +148,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.49207
+      "rawPriceLevelRatio": 0.49207,
+      "consumerInflationRate": 2.3,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "CHN",
@@ -107,7 +162,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.490803
+      "rawPriceLevelRatio": 0.490803,
+      "consumerInflationRate": 1.2,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "BRA",
@@ -116,7 +176,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.46156
+      "rawPriceLevelRatio": 0.46156,
+      "consumerInflationRate": 4.0,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "ARG",
@@ -125,7 +190,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.459061
+      "rawPriceLevelRatio": 0.459061,
+      "consumerInflationRate": 30.4,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "ZAF",
@@ -134,7 +204,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.40548
+      "rawPriceLevelRatio": 0.40548,
+      "consumerInflationRate": 3.9,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "TUR",
@@ -143,7 +218,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.348226
+      "rawPriceLevelRatio": 0.348226,
+      "consumerInflationRate": 28.6,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "RUS",
@@ -152,7 +232,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.314081
+      "rawPriceLevelRatio": 0.314081,
+      "consumerInflationRate": 5.6,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "IDN",
@@ -161,7 +246,12 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.29945
+      "rawPriceLevelRatio": 0.29945,
+      "consumerInflationRate": 3.0,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     },
     {
       "countryCode": "IND",
@@ -170,10 +260,15 @@
       "baseYear": 2024,
       "source": "World Bank WDI",
       "sourceDetail": "world_bank_wdi:PA.NUS.PPPC.RF",
-      "rawPriceLevelRatio": 0.241464
+      "rawPriceLevelRatio": 0.241464,
+      "consumerInflationRate": 4.7,
+      "consumerInflationYear": 2026,
+      "consumerInflationSource": "IMF World Economic Outlook",
+      "consumerInflationSourceDetail": "imf_weo:PCPIPCH",
+      "consumerInflationIsForecast": true
     }
   ],
-  "timestamp": "2026-05-19T14:08:45.706554+00:00",
+  "timestamp": "2026-05-19T14:36:44.121288+00:00",
   "baseYear": 2024,
   "source": "World Bank WDI",
   "sourceUrl": "https://data.worldbank.org/indicator/PA.NUS.PPPC.RF",
@@ -182,11 +277,19 @@
   "indicatorCode": "PA.NUS.PPPC.RF",
   "indicatorName": "Price level ratio of PPP conversion factor (GDP) to market exchange rate",
   "datasetType": "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE",
-  "methodology": "World Bank price level ratio rebased so Korea equals 100",
+  "methodology": "World Bank GDP price level index rebased so Korea equals 100; IMF WEO CPI inflation is supplementary trend context",
   "expectedCountryCount": 19,
   "officialCountryCount": 19,
   "missingCountries": [],
   "hasIncompleteOfficialPull": false,
   "isFallback": false,
-  "fallbackReason": null
+  "fallbackReason": null,
+  "consumerInflationYear": 2026,
+  "consumerInflationSource": "IMF World Economic Outlook",
+  "consumerInflationSourceUrl": "https://data.imf.org/Datasets/WEO",
+  "consumerInflationIndicatorCode": "PCPIPCH",
+  "consumerInflationIndicatorName": "Inflation, average consumer prices",
+  "consumerInflationMethodology": "IMF WEO annual average consumer price inflation, percent change; used as forecast trend context and not as a price-level index",
+  "consumerInflationIsForecast": true,
+  "consumerInflationIsFallback": false
 }

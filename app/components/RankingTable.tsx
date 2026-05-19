@@ -23,6 +23,9 @@ export default function RankingTable({ data }: RankingTableProps) {
             <th scope="col" className={styles.numeric}>
               한국 대비
             </th>
+            <th scope="col" className={styles.numeric}>
+              2026 CPI 전망
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -56,6 +59,9 @@ export default function RankingTable({ data }: RankingTableProps) {
                   }`}
                 >
                   {differenceLabel}
+                </td>
+                <td className={styles.numeric}>
+                  {item.consumerInflationRate.toFixed(1)}%
                 </td>
               </tr>
             );

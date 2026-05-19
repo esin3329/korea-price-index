@@ -40,6 +40,11 @@ export interface KCollusionIndex {
   source: string;
   sourceDetail: string;
   rawPriceLevelRatio: number;
+  consumerInflationRate: number;
+  consumerInflationYear: number;
+  consumerInflationSource: string;
+  consumerInflationSourceDetail: string;
+  consumerInflationIsForecast: boolean;
 }
 
 export interface ChartDataItem {
@@ -50,6 +55,9 @@ export interface ChartDataItem {
   source: string;
   sourceDetail: string;
   rawPriceLevelRatio: number;
+  consumerInflationRate: number;
+  consumerInflationYear: number;
+  consumerInflationIsForecast: boolean;
 }
 
 export interface APIResponse<T> {
