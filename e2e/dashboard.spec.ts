@@ -13,6 +13,10 @@ type IndexDataItem = {
   consumerInflationSource: string;
   consumerInflationSourceDetail: string;
   consumerInflationIsForecast: boolean;
+  latestCpiInflationRate: number;
+  latestCpiInflationYear: number;
+  latestCpiInflationSource: string;
+  latestCpiInflationSourceDetail: string;
 };
 
 test.describe("K-Collusion Index Dashboard", () => {
@@ -70,10 +74,13 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(json.isFallback).toEqual(expect.any(Boolean));
     expect(json.source).toBe("World Bank WDI");
     expect(json.indicatorCode).toBe("PA.NUS.PPPC.RF");
-    expect(json.consumerInflationYear).toBe(2024);
-    expect(json.consumerInflationSource).toBe("World Bank WDI");
-    expect(json.consumerInflationIndicatorCode).toBe("FP.CPI.TOTL.ZG");
-    expect(json.consumerInflationIsForecast).toBe(false);
+    expect(json.consumerInflationYear).toBe(2026);
+    expect(json.consumerInflationSource).toBe("IMF World Economic Outlook");
+    expect(json.consumerInflationIndicatorCode).toBe("PCPIPCH");
+    expect(json.consumerInflationIsForecast).toBe(true);
+    expect(json.latestCpiInflationYear).toBe(2024);
+    expect(json.latestCpiInflationSource).toBe("World Bank WDI");
+    expect(json.latestCpiInflationIndicatorCode).toBe("FP.CPI.TOTL.ZG");
     expect(json.datasetType).toBe(
       "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE",
     );
@@ -87,19 +94,24 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(firstItem.sourceDetail).toBe("world_bank_wdi:PA.NUS.PPPC.RF");
     expect(firstItem.rawPriceLevelRatio).toEqual(expect.any(Number));
     expect(firstItem.consumerInflationRate).toEqual(expect.any(Number));
-    expect(firstItem.consumerInflationYear).toBe(2024);
-    expect(firstItem.consumerInflationSource).toBe("World Bank WDI");
-    expect(firstItem.consumerInflationSourceDetail).toBe(
+    expect(firstItem.consumerInflationYear).toBe(2026);
+    expect(firstItem.consumerInflationSource).toBe("IMF World Economic Outlook");
+    expect(firstItem.consumerInflationSourceDetail).toBe("imf_weo:PCPIPCH");
+    expect(firstItem.consumerInflationIsForecast).toBe(true);
+    expect(firstItem.latestCpiInflationRate).toEqual(expect.any(Number));
+    expect(firstItem.latestCpiInflationYear).toBe(2024);
+    expect(firstItem.latestCpiInflationSource).toBe("World Bank WDI");
+    expect(firstItem.latestCpiInflationSourceDetail).toBe(
       "world_bank_wdi:FP.CPI.TOTL.ZG",
     );
-    expect(firstItem.consumerInflationIsForecast).toBe(false);
 
     const koreaData = json.data.find(
       (item: IndexDataItem) => item.countryCode === "KOR",
     );
     expect(koreaData).toBeDefined();
     expect(koreaData.indexValue).toBe(100);
-    expect(koreaData.consumerInflationRate).toBe(2.3);
+    expect(koreaData.consumerInflationRate).toBe(2.5);
+    expect(koreaData.latestCpiInflationRate).toBe(2.3);
   });
 
   test("완전한 공식 데이터에서는 누락 경고를 표시하지 않는다", async ({ page }) => {

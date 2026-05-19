@@ -77,12 +77,20 @@ WORLD_BANK_PRICE_LEVEL_NAME = (
 DATASET_TYPE = "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE"
 SOURCE = "World Bank WDI"
 SOURCE_DETAIL = f"world_bank_wdi:{WORLD_BANK_PRICE_LEVEL_INDICATOR}"
-WORLD_BANK_CPI_INFLATION_INDICATOR = "FP.CPI.TOTL.ZG"
-WORLD_BANK_CPI_INFLATION_NAME = "Inflation, consumer prices (annual %)"
-WORLD_BANK_CPI_INFLATION_YEAR = 2024
-WORLD_BANK_CPI_INFLATION_SOURCE = "World Bank WDI"
-WORLD_BANK_CPI_INFLATION_SOURCE_DETAIL = (
-    f"world_bank_wdi:{WORLD_BANK_CPI_INFLATION_INDICATOR}"
+IMF_CONSUMER_INFLATION_INDICATOR = "PCPIPCH"
+IMF_CONSUMER_INFLATION_NAME = "Inflation, average consumer prices"
+IMF_CONSUMER_INFLATION_YEAR = 2026
+IMF_CONSUMER_INFLATION_SOURCE = "IMF World Economic Outlook"
+IMF_CONSUMER_INFLATION_SOURCE_DETAIL = (
+    f"imf_weo:{IMF_CONSUMER_INFLATION_INDICATOR}"
+)
+IMF_DATAMAPPER_API_BASE = "https://www.imf.org/external/datamapper/api/v1"
+WORLD_BANK_LATEST_CPI_INFLATION_INDICATOR = "FP.CPI.TOTL.ZG"
+WORLD_BANK_LATEST_CPI_INFLATION_NAME = "Inflation, consumer prices (annual %)"
+WORLD_BANK_LATEST_CPI_INFLATION_YEAR = 2024
+WORLD_BANK_LATEST_CPI_INFLATION_SOURCE = "World Bank WDI"
+WORLD_BANK_LATEST_CPI_INFLATION_SOURCE_DETAIL = (
+    f"world_bank_wdi:{WORLD_BANK_LATEST_CPI_INFLATION_INDICATOR}"
 )
 DATAHUB_CPI_INFLATION_CSV_URL = (
     "https://datahub.io/world-development-indicators/"
@@ -116,7 +124,29 @@ WORLD_BANK_2024_SNAPSHOT = {
     "USA": 1.00,
 }
 
-WORLD_BANK_2024_CPI_INFLATION_SNAPSHOT = {
+IMF_2026_CONSUMER_INFLATION_SNAPSHOT = {
+    "ARG": 30.4,
+    "AUS": 4.0,
+    "BRA": 4.0,
+    "CAN": 2.5,
+    "CHN": 1.2,
+    "FRA": 1.8,
+    "DEU": 2.7,
+    "IND": 4.7,
+    "IDN": 3.0,
+    "ITA": 2.6,
+    "JPN": 2.2,
+    "KOR": 2.5,
+    "MEX": 3.9,
+    "RUS": 5.6,
+    "SAU": 2.3,
+    "ZAF": 3.9,
+    "TUR": 28.6,
+    "GBR": 3.2,
+    "USA": 3.2,
+}
+
+WORLD_BANK_2024_LATEST_CPI_INFLATION_SNAPSHOT = {
     "ARG": 219.883929014578,
     "AUS": 3.1616142830575,
     "BRA": 4.36746407652337,
@@ -398,11 +428,60 @@ def _build_world_bank_cpi_url(
     )
     return (
         f"{WORLD_BANK_API_BASE}/country/{country_key}/indicator/"
-        f"{WORLD_BANK_CPI_INFLATION_INDICATOR}?{query}"
+        f"{WORLD_BANK_LATEST_CPI_INFLATION_INDICATOR}?{query}"
     )
 
 
-def _read_world_bank_cpi_inflation(
+def _build_imf_datamapper_url(year: int = IMF_CONSUMER_INFLATION_YEAR) -> str:
+    countries = "/".join(G20_COUNTRIES)
+    return (
+        f"{IMF_DATAMAPPER_API_BASE}/{IMF_CONSUMER_INFLATION_INDICATOR}/"
+        f"{countries}?periods={year}"
+    )
+
+
+def _read_imf_consumer_inflation_forecast(
+    year: int = IMF_CONSUMER_INFLATION_YEAR,
+) -> dict[str, float]:
+    request = Request(
+        _build_imf_datamapper_url(year),
+        headers={"User-Agent": "curl/8.0.0"},
+    )
+    with urlopen(request, timeout=20) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+
+    values = payload.get("values") if isinstance(payload, dict) else None
+    indicator_values = (
+        values.get(IMF_CONSUMER_INFLATION_INDICATOR)
+        if isinstance(values, dict)
+        else None
+    )
+    if not isinstance(indicator_values, dict):
+        raise InflationDataUnavailableError("IMF DataMapper returned no values")
+
+    inflation: dict[str, float] = {}
+    missing: list[str] = []
+    for country_code in G20_COUNTRIES:
+        country_values = indicator_values.get(country_code)
+        raw_value = (
+            country_values.get(str(year))
+            if isinstance(country_values, dict)
+            else None
+        )
+        if raw_value is None:
+            missing.append(country_code)
+            continue
+        inflation[country_code] = round(float(raw_value), 1)
+
+    if missing:
+        raise InflationDataUnavailableError(
+            f"IMF DataMapper missing {year} forecast values: {', '.join(missing)}"
+        )
+
+    return inflation
+
+
+def _read_world_bank_latest_cpi_inflation(
     *,
     end_year: int | None = None,
     lookback_years: int = LATEST_LOOKBACK_YEARS,
@@ -452,9 +531,25 @@ def _read_datahub_cpi_inflation_values() -> dict[int, dict[str, float]]:
 
 def _enrich_with_consumer_inflation(
     data: list[dict[str, object]],
-) -> tuple[list[dict[str, object]], int, bool]:
+) -> tuple[list[dict[str, object]], int, bool, int, bool]:
     try:
-        inflation, inflation_year = _read_world_bank_cpi_inflation()
+        forecast = _read_imf_consumer_inflation_forecast()
+        is_forecast_fallback = False
+    except (
+        HTTPError,
+        URLError,
+        TimeoutError,
+        InflationDataUnavailableError,
+        DataUnavailableError,
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+    ):
+        forecast = IMF_2026_CONSUMER_INFLATION_SNAPSHOT
+        is_forecast_fallback = True
+
+    try:
+        latest_cpi, latest_cpi_year = _read_world_bank_latest_cpi_inflation()
         is_inflation_fallback = False
     except (
         HTTPError,
@@ -466,11 +561,11 @@ def _enrich_with_consumer_inflation(
         ValueError,
         json.JSONDecodeError,
     ):
-        inflation = {
+        latest_cpi = {
             country_code: round(value, 1)
-            for country_code, value in WORLD_BANK_2024_CPI_INFLATION_SNAPSHOT.items()
+            for country_code, value in WORLD_BANK_2024_LATEST_CPI_INFLATION_SNAPSHOT.items()
         }
-        inflation_year = WORLD_BANK_CPI_INFLATION_YEAR
+        latest_cpi_year = WORLD_BANK_LATEST_CPI_INFLATION_YEAR
         is_inflation_fallback = True
 
     enriched = []
@@ -479,15 +574,27 @@ def _enrich_with_consumer_inflation(
         enriched.append(
             {
                 **item,
-                "consumerInflationRate": inflation[country_code],
-                "consumerInflationYear": inflation_year,
-                "consumerInflationSource": WORLD_BANK_CPI_INFLATION_SOURCE,
-                "consumerInflationSourceDetail": WORLD_BANK_CPI_INFLATION_SOURCE_DETAIL,
-                "consumerInflationIsForecast": False,
+                "consumerInflationRate": forecast[country_code],
+                "consumerInflationYear": IMF_CONSUMER_INFLATION_YEAR,
+                "consumerInflationSource": IMF_CONSUMER_INFLATION_SOURCE,
+                "consumerInflationSourceDetail": IMF_CONSUMER_INFLATION_SOURCE_DETAIL,
+                "consumerInflationIsForecast": True,
+                "latestCpiInflationRate": latest_cpi[country_code],
+                "latestCpiInflationYear": latest_cpi_year,
+                "latestCpiInflationSource": WORLD_BANK_LATEST_CPI_INFLATION_SOURCE,
+                "latestCpiInflationSourceDetail": (
+                    WORLD_BANK_LATEST_CPI_INFLATION_SOURCE_DETAIL
+                ),
             }
         )
 
-    return enriched, inflation_year, is_inflation_fallback
+    return (
+        enriched,
+        IMF_CONSUMER_INFLATION_YEAR,
+        is_forecast_fallback,
+        latest_cpi_year,
+        is_inflation_fallback,
+    )
 
 
 def _refresh_metadata(
@@ -495,7 +602,9 @@ def _refresh_metadata(
     *,
     is_api_fallback: bool,
     consumer_inflation_year: int,
-    is_inflation_fallback: bool,
+    is_forecast_fallback: bool,
+    latest_cpi_inflation_year: int,
+    is_latest_cpi_fallback: bool,
 ) -> dict[str, object]:
     return {
         "expectedCountryCount": len(G20_COUNTRIES),
@@ -507,18 +616,30 @@ def _refresh_metadata(
         if is_api_fallback
         else None,
         "consumerInflationYear": consumer_inflation_year,
-        "consumerInflationSource": WORLD_BANK_CPI_INFLATION_SOURCE,
+        "consumerInflationSource": IMF_CONSUMER_INFLATION_SOURCE,
         "consumerInflationSourceUrl": (
+            "https://data.imf.org/Datasets/WEO"
+        ),
+        "consumerInflationIndicatorCode": IMF_CONSUMER_INFLATION_INDICATOR,
+        "consumerInflationIndicatorName": IMF_CONSUMER_INFLATION_NAME,
+        "consumerInflationMethodology": (
+            "IMF WEO annual average consumer price inflation, percent change; "
+            "used as forecast trend context and not as a price-level index"
+        ),
+        "consumerInflationIsForecast": True,
+        "consumerInflationIsFallback": is_forecast_fallback,
+        "latestCpiInflationYear": latest_cpi_inflation_year,
+        "latestCpiInflationSource": WORLD_BANK_LATEST_CPI_INFLATION_SOURCE,
+        "latestCpiInflationSourceUrl": (
             "https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG"
         ),
-        "consumerInflationIndicatorCode": WORLD_BANK_CPI_INFLATION_INDICATOR,
-        "consumerInflationIndicatorName": WORLD_BANK_CPI_INFLATION_NAME,
-        "consumerInflationMethodology": (
-            "World Bank annual consumer price inflation, percent change; used as "
-            "observed trend context and not as a price-level index"
+        "latestCpiInflationIndicatorCode": WORLD_BANK_LATEST_CPI_INFLATION_INDICATOR,
+        "latestCpiInflationIndicatorName": WORLD_BANK_LATEST_CPI_INFLATION_NAME,
+        "latestCpiInflationMethodology": (
+            "World Bank latest observed annual consumer price inflation, percent "
+            "change; used as historical CPI trend context"
         ),
-        "consumerInflationIsForecast": False,
-        "consumerInflationIsFallback": is_inflation_fallback,
+        "latestCpiInflationIsFallback": is_latest_cpi_fallback,
     }
 
 
@@ -528,8 +649,10 @@ def save_to_json(
     *,
     base_year: int,
     is_api_fallback: bool = False,
-    consumer_inflation_year: int = WORLD_BANK_CPI_INFLATION_YEAR,
-    is_inflation_fallback: bool = False,
+    consumer_inflation_year: int = IMF_CONSUMER_INFLATION_YEAR,
+    is_forecast_fallback: bool = False,
+    latest_cpi_inflation_year: int = WORLD_BANK_LATEST_CPI_INFLATION_YEAR,
+    is_latest_cpi_fallback: bool = False,
 ) -> Path:
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -549,13 +672,16 @@ def save_to_json(
         "datasetType": DATASET_TYPE,
         "methodology": (
             "World Bank GDP price level index rebased so Korea equals 100; "
-            "World Bank observed CPI inflation is supplementary trend context"
+            "IMF WEO CPI forecast and World Bank observed CPI inflation are "
+            "supplementary trend context"
         ),
         **_refresh_metadata(
             data,
             is_api_fallback=is_api_fallback,
             consumer_inflation_year=consumer_inflation_year,
-            is_inflation_fallback=is_inflation_fallback,
+            is_forecast_fallback=is_forecast_fallback,
+            latest_cpi_inflation_year=latest_cpi_inflation_year,
+            is_latest_cpi_fallback=is_latest_cpi_fallback,
         ),
     }
 
@@ -578,13 +704,21 @@ def main(*, require_live: bool = False) -> None:
         data, base_year = build_snapshot_price_levels()
         is_api_fallback = True
 
-    data, consumer_inflation_year, is_inflation_fallback = _enrich_with_consumer_inflation(data)
+    (
+        data,
+        consumer_inflation_year,
+        is_forecast_fallback,
+        latest_cpi_inflation_year,
+        is_latest_cpi_fallback,
+    ) = _enrich_with_consumer_inflation(data)
     filename = save_to_json(
         data,
         base_year=base_year,
         is_api_fallback=is_api_fallback,
         consumer_inflation_year=consumer_inflation_year,
-        is_inflation_fallback=is_inflation_fallback,
+        is_forecast_fallback=is_forecast_fallback,
+        latest_cpi_inflation_year=latest_cpi_inflation_year,
+        is_latest_cpi_fallback=is_latest_cpi_fallback,
     )
     print(f"Wrote {filename}")
     for rank, item in enumerate(data[:5], 1):

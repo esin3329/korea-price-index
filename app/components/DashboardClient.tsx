@@ -33,6 +33,13 @@ type DataFile = {
   consumerInflationMethodology?: string;
   consumerInflationIsForecast?: boolean;
   consumerInflationIsFallback?: boolean;
+  latestCpiInflationYear?: number;
+  latestCpiInflationSource?: string;
+  latestCpiInflationSourceUrl?: string;
+  latestCpiInflationIndicatorCode?: string;
+  latestCpiInflationIndicatorName?: string;
+  latestCpiInflationMethodology?: string;
+  latestCpiInflationIsFallback?: boolean;
 };
 
 type LoadedDataFile = DataFile & {
@@ -60,6 +67,13 @@ type RefreshMetadata = Pick<
   | "consumerInflationMethodology"
   | "consumerInflationIsForecast"
   | "consumerInflationIsFallback"
+  | "latestCpiInflationYear"
+  | "latestCpiInflationSource"
+  | "latestCpiInflationSourceUrl"
+  | "latestCpiInflationIndicatorCode"
+  | "latestCpiInflationIndicatorName"
+  | "latestCpiInflationMethodology"
+  | "latestCpiInflationIsFallback"
 >;
 
 async function loadIndexData(): Promise<LoadedDataFile> {
@@ -101,6 +115,13 @@ function getRefreshMetadata(json: LoadedDataFile): RefreshMetadata {
     consumerInflationMethodology: json.consumerInflationMethodology,
     consumerInflationIsForecast: json.consumerInflationIsForecast,
     consumerInflationIsFallback: json.consumerInflationIsFallback,
+    latestCpiInflationYear: json.latestCpiInflationYear,
+    latestCpiInflationSource: json.latestCpiInflationSource,
+    latestCpiInflationSourceUrl: json.latestCpiInflationSourceUrl,
+    latestCpiInflationIndicatorCode: json.latestCpiInflationIndicatorCode,
+    latestCpiInflationIndicatorName: json.latestCpiInflationIndicatorName,
+    latestCpiInflationMethodology: json.latestCpiInflationMethodology,
+    latestCpiInflationIsFallback: json.latestCpiInflationIsFallback,
   };
 }
 
@@ -184,6 +205,8 @@ export default function DashboardClient() {
           consumerInflationRate: item.consumerInflationRate,
           consumerInflationYear: item.consumerInflationYear,
           consumerInflationIsForecast: item.consumerInflationIsForecast,
+          latestCpiInflationRate: item.latestCpiInflationRate,
+          latestCpiInflationYear: item.latestCpiInflationYear,
         })),
     [data],
   );
@@ -214,14 +237,19 @@ export default function DashboardClient() {
       ? data.reduce((sum, item) => sum + item.consumerInflationRate, 0) /
         data.length
       : 0;
+  const avgLatestCpiInflation =
+    data.length > 0
+      ? data.reduce((sum, item) => sum + item.latestCpiInflationRate, 0) /
+        data.length
+      : 0;
 
   const downloadCsv = () => {
     const csvHeader =
-      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio,consumerInflationRate,consumerInflationYear,consumerInflationSource,consumerInflationSourceDetail,consumerInflationIsForecast\n";
+      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio,consumerInflationRate,consumerInflationYear,consumerInflationSource,consumerInflationSourceDetail,consumerInflationIsForecast,latestCpiInflationRate,latestCpiInflationYear,latestCpiInflationSource,latestCpiInflationSourceDetail\n";
     const csvRows = data
       .map(
         (item) =>
-          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio},${item.consumerInflationRate},${item.consumerInflationYear},"${item.consumerInflationSource}","${item.consumerInflationSourceDetail}",${item.consumerInflationIsForecast}`,
+          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio},${item.consumerInflationRate},${item.consumerInflationYear},"${item.consumerInflationSource}","${item.consumerInflationSourceDetail}",${item.consumerInflationIsForecast},${item.latestCpiInflationRate},${item.latestCpiInflationYear},"${item.latestCpiInflationSource}","${item.latestCpiInflationSourceDetail}"`,
       )
       .join("\n");
     const blob = new Blob([csvHeader + csvRows], {
@@ -309,8 +337,12 @@ export default function DashboardClient() {
           }
         />
         <MetricCard
-          label={`${refreshMetadata?.consumerInflationYear || 2024} CPI 상승률`}
+          label={`${refreshMetadata?.consumerInflationYear || 2026} CPI 전망`}
           value={`${avgConsumerInflation.toFixed(1)}%`}
+        />
+        <MetricCard
+          label={`${refreshMetadata?.latestCpiInflationYear || 2024} CPI 상승률`}
+          value={`${avgLatestCpiInflation.toFixed(1)}%`}
         />
       </section>
 

@@ -48,26 +48,37 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         generate_data,
-        "_read_world_bank_cpi_inflation",
+        "_read_imf_consumer_inflation_forecast",
+        lambda: generate_data.IMF_2026_CONSUMER_INFLATION_SNAPSHOT,
+    )
+    monkeypatch.setattr(
+        generate_data,
+        "_read_world_bank_latest_cpi_inflation",
         lambda: (
             {
                 code: round(value, 1)
-                for code, value in generate_data.WORLD_BANK_2024_CPI_INFLATION_SNAPSHOT.items()
+                for code, value in generate_data.WORLD_BANK_2024_LATEST_CPI_INFLATION_SNAPSHOT.items()
             },
             2024,
         ),
     )
     data, base_year = generate_data.fetch_world_bank_price_levels(end_year=2024)
-    data, consumer_inflation_year, is_inflation_fallback = (
-        generate_data._enrich_with_consumer_inflation(data)
-    )
+    (
+        data,
+        consumer_inflation_year,
+        is_forecast_fallback,
+        latest_cpi_inflation_year,
+        is_latest_cpi_fallback,
+    ) = generate_data._enrich_with_consumer_inflation(data)
 
     filename = generate_data.save_to_json(
         data,
         output_dir=str(tmp_path),
         base_year=base_year,
         consumer_inflation_year=consumer_inflation_year,
-        is_inflation_fallback=is_inflation_fallback,
+        is_forecast_fallback=is_forecast_fallback,
+        latest_cpi_inflation_year=latest_cpi_inflation_year,
+        is_latest_cpi_fallback=is_latest_cpi_fallback,
     )
 
     payload = json.loads(filename.read_text(encoding="utf-8"))
@@ -80,23 +91,27 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
     assert payload["datasetType"] == generate_data.DATASET_TYPE
     assert payload["source"] == generate_data.SOURCE
     assert payload["indicatorCode"] == generate_data.WORLD_BANK_PRICE_LEVEL_INDICATOR
-    assert payload["consumerInflationYear"] == 2024
-    assert payload["consumerInflationIndicatorCode"] == "FP.CPI.TOTL.ZG"
-    assert payload["consumerInflationIsForecast"] is False
+    assert payload["consumerInflationYear"] == 2026
+    assert payload["consumerInflationIndicatorCode"] == "PCPIPCH"
+    assert payload["consumerInflationIsForecast"] is True
+    assert payload["latestCpiInflationYear"] == 2024
+    assert payload["latestCpiInflationIndicatorCode"] == "FP.CPI.TOTL.ZG"
     assert all(item["source"] == generate_data.SOURCE for item in payload["data"])
     assert all(
         item["sourceDetail"] == generate_data.SOURCE_DETAIL
         for item in payload["data"]
     )
     assert all(
-        item["consumerInflationSource"] == generate_data.WORLD_BANK_CPI_INFLATION_SOURCE
+        item["consumerInflationSource"] == generate_data.IMF_CONSUMER_INFLATION_SOURCE
         for item in payload["data"]
     )
 
     korea = next(item for item in payload["data"] if item["countryCode"] == "KOR")
     assert korea["indexValue"] == 100.0
-    assert korea["consumerInflationRate"] == 2.3
-    assert korea["consumerInflationIsForecast"] is False
+    assert korea["consumerInflationRate"] == 2.5
+    assert korea["consumerInflationIsForecast"] is True
+    assert korea["latestCpiInflationRate"] == 2.3
+    assert korea["latestCpiInflationYear"] == 2024
 
 
 def test_snapshot_builds_latest_official_price_level_data():
@@ -110,17 +125,31 @@ def test_snapshot_builds_latest_official_price_level_data():
     ] == 100.0
 
 
-def test_world_bank_snapshot_consumer_inflation_covers_g20():
-    data, consumer_inflation_year, is_fallback = generate_data._enrich_with_consumer_inflation(
+def test_inflation_forecast_and_latest_cpi_cover_g20():
+    (
+        data,
+        consumer_inflation_year,
+        is_forecast_fallback,
+        latest_cpi_inflation_year,
+        is_latest_cpi_fallback,
+    ) = generate_data._enrich_with_consumer_inflation(
         [{"countryCode": code} for code in generate_data.G20_COUNTRIES]
     )
 
-    assert isinstance(is_fallback, bool)
-    assert consumer_inflation_year == 2024
+    assert isinstance(is_forecast_fallback, bool)
+    assert isinstance(is_latest_cpi_fallback, bool)
+    assert consumer_inflation_year == 2026
+    assert latest_cpi_inflation_year == 2024
     assert len(data) == len(generate_data.G20_COUNTRIES)
     assert next(item for item in data if item["countryCode"] == "KOR")[
         "consumerInflationRate"
+    ] == 2.5
+    assert next(item for item in data if item["countryCode"] == "KOR")[
+        "latestCpiInflationRate"
     ] == 2.3
     assert next(item for item in data if item["countryCode"] == "USA")[
         "consumerInflationRate"
+    ] == 3.2
+    assert next(item for item in data if item["countryCode"] == "USA")[
+        "latestCpiInflationRate"
     ] == 2.9

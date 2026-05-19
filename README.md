@@ -85,8 +85,9 @@ Cloudflare Pages 산출물 경로는 `wrangler.toml`에서 `out`으로 지정합
 pages_build_output_dir = "out"
 ```
 
-## Latest Consumer Inflation Context
+## Consumer Inflation Context
 
 - World Bank `PA.NUS.PPPC.RF` remains the primary cross-country price-level measure. It is GDP-wide, so it is suitable for broad relative price-level comparison, but it is not a pure consumer basket or cost-of-living index.
-- For consumer-specific context, `python/generate_data.py` adds World Bank WDI `FP.CPI.TOTL.ZG`, the latest observed annual consumer price inflation rate available for every G20 country.
-- The CPI inflation field is an observed change-rate supplement, not a replacement for the World Bank price-level index. The generated JSON marks it with `consumerInflationIsForecast: false`.
+- `consumerInflationRate` keeps the IMF WEO `PCPIPCH` 2026 annual average consumer price inflation forecast for every G20 country.
+- `latestCpiInflationRate` adds World Bank WDI `FP.CPI.TOTL.ZG`, the latest observed annual consumer price inflation rate available for every G20 country.
+- Both CPI fields are change-rate supplements, not replacements for the World Bank price-level index.
