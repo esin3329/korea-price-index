@@ -382,7 +382,7 @@
       "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
     }
   ],
-  "timestamp": "2026-05-19T19:56:58.939604+00:00",
+  "timestamp": "2026-05-19T20:02:47.106481+00:00",
   "baseYear": 2024,
   "source": "World Bank WDI",
   "sourceUrl": "https://data.worldbank.org/indicator/PA.NUS.PPPC.RF",
