@@ -33,7 +33,7 @@ jobs:
         run: |
           set -e
           echo "Running python/generate_data.py"
-          python python/generate_data.py
+          python python/generate_data.py --require-live
 
       - name: Check for changes
         id: check

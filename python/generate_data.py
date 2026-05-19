@@ -7,6 +7,7 @@ against Korea so that KOR is always 100.
 
 from __future__ import annotations
 
+import argparse
 import json
 import socket
 from datetime import datetime, timezone
@@ -101,8 +102,13 @@ class DataUnavailableError(RuntimeError):
     """Raised when a complete official price-level dataset is unavailable."""
 
 
-def _build_world_bank_url(start_year: int, end_year: int) -> str:
-    country_key = ";".join(WORLD_BANK_COUNTRY_CODES)
+def _build_world_bank_url(
+    start_year: int,
+    end_year: int,
+    *,
+    country_codes: list[str] | None = None,
+) -> str:
+    country_key = ";".join(country_codes or WORLD_BANK_COUNTRY_CODES)
     query = urlencode(
         {
             "format": "json",
@@ -133,6 +139,34 @@ def _read_world_bank_json(url: str) -> list[dict[str, object]]:
     if not isinstance(rows, list):
         raise DataUnavailableError("World Bank API response did not contain rows")
     return rows
+
+
+def _read_world_bank_rows(start_year: int, end_year: int) -> list[dict[str, object]]:
+    """Read rows from World Bank, retrying per country if the bulk call fails."""
+    try:
+        return _read_world_bank_json(_build_world_bank_url(start_year, end_year))
+    except (HTTPError, URLError, TimeoutError, DataUnavailableError, OSError) as bulk_error:
+        rows: list[dict[str, object]] = []
+        failures: list[str] = []
+
+        for country_code in WORLD_BANK_COUNTRY_CODES:
+            url = _build_world_bank_url(
+                start_year,
+                end_year,
+                country_codes=[country_code],
+            )
+            try:
+                rows.extend(_read_world_bank_json(url))
+            except (HTTPError, URLError, TimeoutError, DataUnavailableError, OSError):
+                failures.append(country_code)
+
+        if rows:
+            return rows
+
+        raise DataUnavailableError(
+            "World Bank API bulk and per-country fetches failed: "
+            f"{bulk_error}; failed countries: {', '.join(failures)}"
+        ) from bulk_error
 
 
 def _country_code_from_row(row: dict[str, object]) -> str | None:
@@ -199,7 +233,7 @@ def fetch_world_bank_price_levels(
     current_year = datetime.now(timezone.utc).year
     end_year = end_year or current_year
     start_year = end_year - lookback_years
-    rows = _read_world_bank_json(_build_world_bank_url(start_year, end_year))
+    rows = _read_world_bank_rows(start_year, end_year)
     values_by_year = _extract_price_level_rows(rows)
     base_year = _latest_complete_year(values_by_year)
     values = values_by_year[base_year]
@@ -292,12 +326,14 @@ def save_to_json(
     return filename
 
 
-def main() -> None:
+def main(*, require_live: bool = False) -> None:
     print("Generating K-Collusion Index price-level data")
     try:
         data, base_year = fetch_world_bank_price_levels()
         is_api_fallback = False
     except (HTTPError, URLError, TimeoutError, DataUnavailableError, OSError) as exc:
+        if require_live:
+            raise SystemExit(f"World Bank API live fetch failed: {exc}") from exc
         print(f"World Bank API fetch failed, using checked-in WDI snapshot: {exc}")
         data, base_year = build_snapshot_price_levels()
         is_api_fallback = True
@@ -309,4 +345,13 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Generate static K-Collusion Index price-level data."
+    )
+    parser.add_argument(
+        "--require-live",
+        action="store_true",
+        help="Fail instead of using the checked-in snapshot when World Bank API is unavailable.",
+    )
+    args = parser.parse_args()
+    main(require_live=args.require_live)
