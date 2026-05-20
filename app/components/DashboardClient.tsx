@@ -347,11 +347,11 @@ export default function DashboardClient() {
           }
         />
         <MetricCard
-          label={`${refreshMetadata?.consumerInflationYear || 2026} CPI 전망`}
+          label={`${refreshMetadata?.consumerInflationYear || 2026} 소비자물가지수(CPI) 전망`}
           value={`${avgConsumerInflation.toFixed(1)}%`}
         />
         <MetricCard
-          label={`CPI 전년동월비${refreshMetadata?.latestCpiInflationPeriod ? ` (${refreshMetadata.latestCpiInflationPeriod})` : ""}`}
+          label={`소비자물가지수(CPI) 전년동월비${refreshMetadata?.latestCpiInflationPeriod ? ` (${refreshMetadata.latestCpiInflationPeriod})` : ""}`}
           value={`${avgLatestCpiInflation.toFixed(1)}%`}
         />
       </section>

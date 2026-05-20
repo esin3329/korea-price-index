@@ -24,10 +24,10 @@ export default function RankingTable({ data }: RankingTableProps) {
               한국 대비
             </th>
             <th scope="col" className={styles.numeric}>
-              2026 CPI 전망
+              2026 소비자물가지수(CPI) 전망
             </th>
             <th scope="col" className={styles.numeric}>
-              CPI 전년동월비
+              소비자물가지수(CPI) 전년동월비
             </th>
           </tr>
         </thead>

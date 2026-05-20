@@ -39,6 +39,9 @@ test.describe("K-Collusion Index Dashboard", () => {
     await expect(page.getByText("평균 지수")).toBeVisible();
     await expect(page.getByText("가장 높은 물가 수준")).toBeVisible();
     await expect(page.getByText("가장 낮은 물가 수준")).toBeVisible();
+    const metrics = page.getByLabel("핵심 지표");
+    await expect(metrics.getByText("2026 소비자물가지수(CPI) 전망")).toBeVisible();
+    await expect(metrics.getByText(/소비자물가지수\(CPI\) 전년동월비/)).toBeVisible();
   });
 
   test("차트와 순위표가 표시된다", async ({ page }) => {
@@ -49,6 +52,8 @@ test.describe("K-Collusion Index Dashboard", () => {
       timeout: 10000,
     });
     await expect(page.getByText("국가별 순위")).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "2026 소비자물가지수(CPI) 전망" })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "소비자물가지수(CPI) 전년동월비" })).toBeVisible();
 
     const rows = page.locator("table tbody tr");
     await expect(rows).toHaveCount(19);
