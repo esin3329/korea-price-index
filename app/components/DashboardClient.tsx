@@ -36,6 +36,7 @@ type DataFile = {
   consumerInflationIsForecast?: boolean;
   consumerInflationIsFallback?: boolean;
   latestCpiInflationYear?: number;
+  latestCpiInflationPeriod?: string;
   latestCpiInflationSource?: string;
   latestCpiInflationSourceUrl?: string;
   latestCpiInflationIndicatorCode?: string;
@@ -72,6 +73,7 @@ type RefreshMetadata = Pick<
   | "consumerInflationIsForecast"
   | "consumerInflationIsFallback"
   | "latestCpiInflationYear"
+  | "latestCpiInflationPeriod"
   | "latestCpiInflationSource"
   | "latestCpiInflationSourceUrl"
   | "latestCpiInflationIndicatorCode"
@@ -122,6 +124,7 @@ function getRefreshMetadata(json: LoadedDataFile): RefreshMetadata {
     consumerInflationIsForecast: json.consumerInflationIsForecast,
     consumerInflationIsFallback: json.consumerInflationIsFallback,
     latestCpiInflationYear: json.latestCpiInflationYear,
+    latestCpiInflationPeriod: json.latestCpiInflationPeriod,
     latestCpiInflationSource: json.latestCpiInflationSource,
     latestCpiInflationSourceUrl: json.latestCpiInflationSourceUrl,
     latestCpiInflationIndicatorCode: json.latestCpiInflationIndicatorCode,
@@ -213,6 +216,7 @@ export default function DashboardClient() {
           consumerInflationIsForecast: item.consumerInflationIsForecast,
           latestCpiInflationRate: item.latestCpiInflationRate,
           latestCpiInflationYear: item.latestCpiInflationYear,
+          latestCpiInflationPeriod: item.latestCpiInflationPeriod,
         })),
     [data],
   );
@@ -251,11 +255,11 @@ export default function DashboardClient() {
 
   const downloadCsv = () => {
     const csvHeader =
-      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio,consumerInflationRate,consumerInflationYear,consumerInflationSource,consumerInflationSourceDetail,consumerInflationVintage,consumerInflationPublicationDate,consumerInflationIsForecast,latestCpiInflationRate,latestCpiInflationYear,latestCpiInflationSource,latestCpiInflationSourceDetail\n";
+      "countryCode,countryName,indexValue,baseYear,source,sourceDetail,rawPriceLevelRatio,consumerInflationRate,consumerInflationYear,consumerInflationSource,consumerInflationSourceDetail,consumerInflationVintage,consumerInflationPublicationDate,consumerInflationIsForecast,latestCpiInflationRate,latestCpiInflationYear,latestCpiInflationPeriod,latestCpiInflationSource,latestCpiInflationSourceDetail\n";
     const csvRows = data
       .map(
         (item) =>
-          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio},${item.consumerInflationRate},${item.consumerInflationYear},"${item.consumerInflationSource}","${item.consumerInflationSourceDetail}","${item.consumerInflationVintage}","${item.consumerInflationPublicationDate}",${item.consumerInflationIsForecast},${item.latestCpiInflationRate},${item.latestCpiInflationYear},"${item.latestCpiInflationSource}","${item.latestCpiInflationSourceDetail}"`,
+          `${item.countryCode},"${item.countryName}",${item.indexValue},${item.baseYear},"${item.source}","${item.sourceDetail}",${item.rawPriceLevelRatio},${item.consumerInflationRate},${item.consumerInflationYear},"${item.consumerInflationSource}","${item.consumerInflationSourceDetail}","${item.consumerInflationVintage}","${item.consumerInflationPublicationDate}",${item.consumerInflationIsForecast},${item.latestCpiInflationRate},${item.latestCpiInflationYear},"${item.latestCpiInflationPeriod}","${item.latestCpiInflationSource}","${item.latestCpiInflationSourceDetail}"`,
       )
       .join("\n");
     const blob = new Blob([csvHeader + csvRows], {
@@ -347,7 +351,7 @@ export default function DashboardClient() {
           value={`${avgConsumerInflation.toFixed(1)}%`}
         />
         <MetricCard
-          label={`${refreshMetadata?.latestCpiInflationYear || 2024} CPI 상승률`}
+          label={`CPI 전년동월비${refreshMetadata?.latestCpiInflationPeriod ? ` (${refreshMetadata.latestCpiInflationPeriod})` : ""}`}
           value={`${avgLatestCpiInflation.toFixed(1)}%`}
         />
       </section>

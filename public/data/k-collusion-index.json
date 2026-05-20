@@ -16,10 +16,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 2.9,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 3.8,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "AUS",
@@ -36,10 +37,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 3.2,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 4.6,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "GBR",
@@ -56,10 +58,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 3.3,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 3.4,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "CAN",
@@ -76,10 +79,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 2.4,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 2.8,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "DEU",
@@ -96,10 +100,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 2.3,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 2.0,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "FRA",
@@ -116,10 +121,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 2.0,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 0.7,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "ITA",
@@ -136,10 +142,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 1.0,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 1.2,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "JPN",
@@ -156,10 +163,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 2.7,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 1.5,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "KOR",
@@ -176,10 +184,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 2.3,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 2.6,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "MEX",
@@ -196,10 +205,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 4.7,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 4.4,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "SAU",
@@ -217,9 +227,10 @@
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
       "latestCpiInflationRate": 1.7,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "CHN",
@@ -236,10 +247,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 0.2,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 1.2,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "BRA",
@@ -257,9 +269,10 @@
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
       "latestCpiInflationRate": 4.4,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "ARG",
@@ -276,10 +289,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 219.9,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 32.4,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "ZAF",
@@ -296,10 +310,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 4.4,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 3.0,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "TUR",
@@ -316,10 +331,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 58.5,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 30.9,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "RUS",
@@ -336,10 +352,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 8.4,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 16.7,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "IDN",
@@ -356,10 +373,11 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 2.2,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 2.4,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     },
     {
       "countryCode": "IND",
@@ -376,13 +394,14 @@
       "consumerInflationVintage": "April 2026",
       "consumerInflationPublicationDate": "2026-04-14",
       "consumerInflationIsForecast": true,
-      "latestCpiInflationRate": 5.0,
-      "latestCpiInflationYear": 2024,
-      "latestCpiInflationSource": "World Bank WDI",
-      "latestCpiInflationSourceDetail": "world_bank_wdi:FP.CPI.TOTL.ZG"
+      "latestCpiInflationRate": 4.3,
+      "latestCpiInflationYear": 2026,
+      "latestCpiInflationPeriod": "2026-04",
+      "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+      "latestCpiInflationSourceDetail": "oecd_g20_prices:GY"
     }
   ],
-  "timestamp": "2026-05-19T20:02:47.106481+00:00",
+  "timestamp": "2026-05-20T04:08:16.468519+00:00",
   "baseYear": 2024,
   "source": "World Bank WDI",
   "sourceUrl": "https://data.worldbank.org/indicator/PA.NUS.PPPC.RF",
@@ -391,13 +410,13 @@
   "indicatorCode": "PA.NUS.PPPC.RF",
   "indicatorName": "Price level ratio of PPP conversion factor (GDP) to market exchange rate",
   "datasetType": "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE",
-  "methodology": "World Bank GDP price level index rebased so Korea equals 100; IMF WEO CPI forecast and World Bank observed CPI inflation are supplementary trend context",
+  "methodology": "World Bank GDP price level index rebased so Korea equals 100; IMF WEO CPI forecast and OECD monthly CPI year-on-year inflation are supplementary trend context",
   "expectedCountryCount": 19,
   "officialCountryCount": 19,
   "missingCountries": [],
   "hasIncompleteOfficialPull": false,
-  "isFallback": false,
-  "fallbackReason": null,
+  "isFallback": true,
+  "fallbackReason": "World Bank API unavailable; using latest checked-in WDI snapshot",
   "consumerInflationYear": 2026,
   "consumerInflationSource": "IMF World Economic Outlook (April 2026)",
   "consumerInflationSourceUrl": "https://www.imf.org/en/publications/weo/issues/2026/04/14/world-economic-outlook-april-2026",
@@ -407,12 +426,13 @@
   "consumerInflationPublicationDate": "2026-04-14",
   "consumerInflationMethodology": "IMF WEO April 2026 annual average consumer price inflation, percent change; used as forecast trend context and not as a price-level index",
   "consumerInflationIsForecast": true,
-  "consumerInflationIsFallback": false,
-  "latestCpiInflationYear": 2024,
-  "latestCpiInflationSource": "World Bank WDI",
-  "latestCpiInflationSourceUrl": "https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG",
-  "latestCpiInflationIndicatorCode": "FP.CPI.TOTL.ZG",
-  "latestCpiInflationIndicatorName": "Inflation, consumer prices (annual %)",
-  "latestCpiInflationMethodology": "World Bank latest observed annual consumer price inflation, percent change; used as historical CPI trend context",
-  "latestCpiInflationIsFallback": false
+  "consumerInflationIsFallback": true,
+  "latestCpiInflationYear": 2026,
+  "latestCpiInflationPeriod": "2026-04",
+  "latestCpiInflationSource": "OECD G20 Consumer Price Indices",
+  "latestCpiInflationSourceUrl": "https://data-explorer.oecd.org/vis?df[ag]=OECD.SDD.TPS&df[id]=DSD_G20_PRICES%40DF_G20_PRICES",
+  "latestCpiInflationIndicatorCode": "GY",
+  "latestCpiInflationIndicatorName": "CPI all items, growth rate over 1 year",
+  "latestCpiInflationMethodology": "OECD G20 monthly CPI all-items growth rate over 1 year, percent; used as latest year-on-year CPI trend context",
+  "latestCpiInflationIsFallback": true
 }

@@ -49,6 +49,7 @@ export interface KCollusionIndex {
   consumerInflationIsForecast: boolean;
   latestCpiInflationRate: number;
   latestCpiInflationYear: number;
+  latestCpiInflationPeriod: string;
   latestCpiInflationSource: string;
   latestCpiInflationSourceDetail: string;
 }
@@ -66,6 +67,7 @@ export interface ChartDataItem {
   consumerInflationIsForecast: boolean;
   latestCpiInflationRate: number;
   latestCpiInflationYear: number;
+  latestCpiInflationPeriod: string;
 }
 
 export interface APIResponse<T> {

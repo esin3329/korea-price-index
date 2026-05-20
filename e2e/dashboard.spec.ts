@@ -17,6 +17,7 @@ type IndexDataItem = {
   consumerInflationIsForecast: boolean;
   latestCpiInflationRate: number;
   latestCpiInflationYear: number;
+  latestCpiInflationPeriod: string;
   latestCpiInflationSource: string;
   latestCpiInflationSourceDetail: string;
 };
@@ -84,9 +85,10 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(json.consumerInflationVintage).toBe("April 2026");
     expect(json.consumerInflationPublicationDate).toBe("2026-04-14");
     expect(json.consumerInflationIsForecast).toBe(true);
-    expect(json.latestCpiInflationYear).toBe(2024);
-    expect(json.latestCpiInflationSource).toBe("World Bank WDI");
-    expect(json.latestCpiInflationIndicatorCode).toBe("FP.CPI.TOTL.ZG");
+    expect(json.latestCpiInflationYear).toBe(2026);
+    expect(json.latestCpiInflationPeriod).toMatch(/^\d{4}-\d{2}$/);
+    expect(json.latestCpiInflationSource).toBe("OECD G20 Consumer Price Indices");
+    expect(json.latestCpiInflationIndicatorCode).toBe("GY");
     expect(json.datasetType).toBe(
       "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE",
     );
@@ -109,10 +111,13 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(firstItem.consumerInflationPublicationDate).toBe("2026-04-14");
     expect(firstItem.consumerInflationIsForecast).toBe(true);
     expect(firstItem.latestCpiInflationRate).toEqual(expect.any(Number));
-    expect(firstItem.latestCpiInflationYear).toBe(2024);
-    expect(firstItem.latestCpiInflationSource).toBe("World Bank WDI");
+    expect(firstItem.latestCpiInflationYear).toBe(2026);
+    expect(firstItem.latestCpiInflationPeriod).toMatch(/^\d{4}-\d{2}$/);
+    expect(firstItem.latestCpiInflationSource).toBe(
+      "OECD G20 Consumer Price Indices",
+    );
     expect(firstItem.latestCpiInflationSourceDetail).toBe(
-      "world_bank_wdi:FP.CPI.TOTL.ZG",
+      "oecd_g20_prices:GY",
     );
 
     const koreaData = json.data.find(
@@ -121,7 +126,7 @@ test.describe("K-Collusion Index Dashboard", () => {
     expect(koreaData).toBeDefined();
     expect(koreaData.indexValue).toBe(100);
     expect(koreaData.consumerInflationRate).toBe(2.5);
-    expect(koreaData.latestCpiInflationRate).toBe(2.3);
+    expect(koreaData.latestCpiInflationRate).toBe(2.6);
   });
 
   test("완전한 공식 데이터에서는 누락 경고를 표시하지 않는다", async ({ page }) => {

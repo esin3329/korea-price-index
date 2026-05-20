@@ -53,13 +53,13 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         generate_data,
-        "_read_world_bank_latest_cpi_inflation",
+        "_read_oecd_latest_cpi_yoy_inflation",
         lambda: (
             {
-                code: round(value, 1)
-                for code, value in generate_data.WORLD_BANK_2024_LATEST_CPI_INFLATION_SNAPSHOT.items()
+                code: 2.0
+                for code in generate_data.G20_COUNTRIES
             },
-            2024,
+            "2026-04",
         ),
     )
     data, base_year = generate_data.fetch_world_bank_price_levels(end_year=2024)
@@ -68,6 +68,7 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
         consumer_inflation_year,
         is_forecast_fallback,
         latest_cpi_inflation_year,
+        latest_cpi_inflation_period,
         is_latest_cpi_fallback,
     ) = generate_data._enrich_with_consumer_inflation(data)
 
@@ -78,6 +79,7 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
         consumer_inflation_year=consumer_inflation_year,
         is_forecast_fallback=is_forecast_fallback,
         latest_cpi_inflation_year=latest_cpi_inflation_year,
+        latest_cpi_inflation_period=latest_cpi_inflation_period,
         is_latest_cpi_fallback=is_latest_cpi_fallback,
     )
 
@@ -96,8 +98,10 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
     assert payload["consumerInflationVintage"] == "April 2026"
     assert payload["consumerInflationPublicationDate"] == "2026-04-14"
     assert payload["consumerInflationIsForecast"] is True
-    assert payload["latestCpiInflationYear"] == 2024
-    assert payload["latestCpiInflationIndicatorCode"] == "FP.CPI.TOTL.ZG"
+    assert payload["latestCpiInflationYear"] == 2026
+    assert payload["latestCpiInflationPeriod"] == "2026-04"
+    assert payload["latestCpiInflationSource"] == "OECD G20 Consumer Price Indices"
+    assert payload["latestCpiInflationIndicatorCode"] == "GY"
     assert all(item["source"] == generate_data.SOURCE for item in payload["data"])
     assert all(
         item["sourceDetail"] == generate_data.SOURCE_DETAIL
@@ -114,8 +118,9 @@ def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
     assert korea["consumerInflationVintage"] == "April 2026"
     assert korea["consumerInflationPublicationDate"] == "2026-04-14"
     assert korea["consumerInflationIsForecast"] is True
-    assert korea["latestCpiInflationRate"] == 2.3
-    assert korea["latestCpiInflationYear"] == 2024
+    assert korea["latestCpiInflationRate"] == 2.0
+    assert korea["latestCpiInflationYear"] == 2026
+    assert korea["latestCpiInflationPeriod"] == "2026-04"
 
 
 def test_snapshot_builds_latest_official_price_level_data():
@@ -135,6 +140,7 @@ def test_inflation_forecast_and_latest_cpi_cover_g20():
         consumer_inflation_year,
         is_forecast_fallback,
         latest_cpi_inflation_year,
+        latest_cpi_inflation_period,
         is_latest_cpi_fallback,
     ) = generate_data._enrich_with_consumer_inflation(
         [{"countryCode": code} for code in generate_data.G20_COUNTRIES]
@@ -143,17 +149,28 @@ def test_inflation_forecast_and_latest_cpi_cover_g20():
     assert isinstance(is_forecast_fallback, bool)
     assert isinstance(is_latest_cpi_fallback, bool)
     assert consumer_inflation_year == 2026
-    assert latest_cpi_inflation_year == 2024
+    assert latest_cpi_inflation_year == 2026
+    assert latest_cpi_inflation_period == "2026-04"
     assert len(data) == len(generate_data.G20_COUNTRIES)
     assert next(item for item in data if item["countryCode"] == "KOR")[
         "consumerInflationRate"
     ] == 2.5
     assert next(item for item in data if item["countryCode"] == "KOR")[
         "latestCpiInflationRate"
-    ] == 2.3
+    ] == 2.6
     assert next(item for item in data if item["countryCode"] == "USA")[
         "consumerInflationRate"
     ] == 3.2
     assert next(item for item in data if item["countryCode"] == "USA")[
         "latestCpiInflationRate"
-    ] == 2.9
+    ] == 3.8
+
+
+def test_oecd_g20_cpi_url_requests_monthly_year_over_year_growth():
+    url = generate_data._build_oecd_g20_cpi_yoy_url("2026-04", lookback_months=0)
+
+    assert "OECD.SDD.TPS,DSD_G20_PRICES@DF_G20_PRICES,1.0" in url
+    assert ".M..CPI.PA._T.N.GY" in url
+    assert "startPeriod=2026-04" in url
+    assert "endPeriod=2026-04" in url
+    assert "format=csvfilewithlabels" in url

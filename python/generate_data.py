@@ -70,6 +70,7 @@ OUTPUT_COUNTRY_CODES = {
 }
 
 WORLD_BANK_API_BASE = "https://api.worldbank.org/v2"
+OECD_API_BASE = "https://sdmx.oecd.org/public/rest/data"
 WORLD_BANK_PRICE_LEVEL_INDICATOR = "PA.NUS.PPPC.RF"
 WORLD_BANK_PRICE_LEVEL_NAME = (
     "Price level ratio of PPP conversion factor (GDP) to market exchange rate"
@@ -100,6 +101,11 @@ WORLD_BANK_LATEST_CPI_INFLATION_SOURCE = "World Bank WDI"
 WORLD_BANK_LATEST_CPI_INFLATION_SOURCE_DETAIL = (
     f"world_bank_wdi:{WORLD_BANK_LATEST_CPI_INFLATION_INDICATOR}"
 )
+OECD_G20_CPI_DATAFLOW = "OECD.SDD.TPS,DSD_G20_PRICES@DF_G20_PRICES,1.0"
+OECD_G20_CPI_YOY_INDICATOR = "GY"
+OECD_G20_CPI_YOY_NAME = "CPI all items, growth rate over 1 year"
+OECD_G20_CPI_YOY_SOURCE = "OECD G20 Consumer Price Indices"
+OECD_G20_CPI_YOY_SOURCE_DETAIL = f"oecd_g20_prices:{OECD_G20_CPI_YOY_INDICATOR}"
 DATAHUB_CPI_INFLATION_CSV_URL = (
     "https://datahub.io/world-development-indicators/"
     "fp.cpi.totl.zg/_r/-/data.csv"
@@ -109,6 +115,7 @@ AUTARIO_WORLD_BANK_DATASET_API = (
     "3b933e66-0321-4ae3-adcb-ff352bfb00f0/data"
 )
 LATEST_LOOKBACK_YEARS = 8
+LATEST_CPI_YOY_LOOKBACK_MONTHS = 72
 
 WORLD_BANK_2024_SNAPSHOT = {
     "ARG": 0.459061319225925,
@@ -174,6 +181,29 @@ WORLD_BANK_2024_LATEST_CPI_INFLATION_SNAPSHOT = {
     "TUR": 58.5064507300343,
     "GBR": 3.2715729463592,
     "USA": 2.94952520485207,
+}
+
+OECD_LATEST_CPI_YOY_PERIOD_SNAPSHOT = "2026-04"
+OECD_LATEST_CPI_YOY_SNAPSHOT = {
+    "ARG": 32.4,
+    "AUS": 4.6,
+    "BRA": 4.4,
+    "CAN": 2.8,
+    "CHN": 1.2,
+    "FRA": 0.7,
+    "DEU": 2.0,
+    "IND": 4.3,
+    "IDN": 2.4,
+    "ITA": 1.2,
+    "JPN": 1.5,
+    "KOR": 2.6,
+    "MEX": 4.4,
+    "RUS": 16.7,
+    "SAU": 1.7,
+    "ZAF": 3.0,
+    "TUR": 30.9,
+    "GBR": 3.4,
+    "USA": 3.8,
 }
 
 
@@ -412,7 +442,7 @@ def build_snapshot_price_levels() -> tuple[list[dict[str, object]], int]:
             "baseYear": base_year,
             "source": SOURCE,
             "sourceDetail": SOURCE_DETAIL,
-            "rawPriceLevelRatio": WORLD_BANK_2024_SNAPSHOT[country_code],
+            "rawPriceLevelRatio": round(WORLD_BANK_2024_SNAPSHOT[country_code], 6),
         }
         for country_code in G20_COUNTRIES
     ]
@@ -437,6 +467,36 @@ def _build_world_bank_cpi_url(
     return (
         f"{WORLD_BANK_API_BASE}/country/{country_key}/indicator/"
         f"{WORLD_BANK_LATEST_CPI_INFLATION_INDICATOR}?{query}"
+    )
+
+
+def _month_offset(period: str, months: int) -> str:
+    year, month = (int(part) for part in period.split("-"))
+    month_index = year * 12 + (month - 1) + months
+    return f"{month_index // 12:04d}-{month_index % 12 + 1:02d}"
+
+
+def _build_oecd_g20_cpi_yoy_url(
+    end_period: str | None = None,
+    *,
+    lookback_months: int = LATEST_CPI_YOY_LOOKBACK_MONTHS,
+) -> str:
+    if end_period is None:
+        now = datetime.now(timezone.utc)
+        end_period = f"{now.year:04d}-{now.month:02d}"
+    start_period = _month_offset(end_period, -lookback_months)
+    countries = "+".join(G20_COUNTRIES)
+    query = urlencode(
+        {
+            "startPeriod": start_period,
+            "endPeriod": end_period,
+            "dimensionAtObservation": "AllDimensions",
+            "format": "csvfilewithlabels",
+        }
+    )
+    return (
+        f"{OECD_API_BASE}/{OECD_G20_CPI_DATAFLOW}/"
+        f"{countries}.M..CPI.PA._T.N.{OECD_G20_CPI_YOY_INDICATOR}?{query}"
     )
 
 
@@ -511,6 +571,45 @@ def _read_world_bank_latest_cpi_inflation(
     }, base_year
 
 
+def _read_oecd_latest_cpi_yoy_inflation(
+    period: str | None = None,
+) -> tuple[dict[str, float], str]:
+    request = Request(
+        _build_oecd_g20_cpi_yoy_url(period),
+        headers={"User-Agent": "k-collusion-index/1.0"},
+    )
+    with urlopen(request, timeout=30) as response:
+        text = response.read().decode("utf-8")
+
+    latest_by_country: dict[str, tuple[str, float]] = {}
+    reader = csv.DictReader(io.StringIO(text.lstrip("\ufeff")))
+    for row in reader:
+        country_code = row.get("REF_AREA")
+        time_period = row.get("TIME_PERIOD")
+        raw_value = row.get("OBS_VALUE")
+        if country_code not in G20_COUNTRIES or not time_period or not raw_value:
+            continue
+        try:
+            value = float(raw_value)
+        except ValueError:
+            continue
+        existing = latest_by_country.get(country_code)
+        if existing is None or time_period > existing[0]:
+            latest_by_country[country_code] = (time_period, value)
+
+    missing = [code for code in G20_COUNTRIES if code not in latest_by_country]
+    if missing:
+        raise InflationDataUnavailableError(
+            f"OECD G20 CPI YoY missing values: {', '.join(missing)}"
+        )
+
+    latest_period = max(period for period, _value in latest_by_country.values())
+    return {
+        country_code: round(latest_by_country[country_code][1], 1)
+        for country_code in G20_COUNTRIES
+    }, latest_period
+
+
 def _read_datahub_cpi_inflation_values() -> dict[int, dict[str, float]]:
     request = Request(
         DATAHUB_CPI_INFLATION_CSV_URL,
@@ -539,7 +638,7 @@ def _read_datahub_cpi_inflation_values() -> dict[int, dict[str, float]]:
 
 def _enrich_with_consumer_inflation(
     data: list[dict[str, object]],
-) -> tuple[list[dict[str, object]], int, bool, int, bool]:
+) -> tuple[list[dict[str, object]], int, bool, int, str, bool]:
     try:
         forecast = _read_imf_consumer_inflation_forecast()
         is_forecast_fallback = False
@@ -557,7 +656,7 @@ def _enrich_with_consumer_inflation(
         is_forecast_fallback = True
 
     try:
-        latest_cpi, latest_cpi_year = _read_world_bank_latest_cpi_inflation()
+        latest_cpi, latest_cpi_period = _read_oecd_latest_cpi_yoy_inflation()
         is_inflation_fallback = False
     except (
         HTTPError,
@@ -569,12 +668,10 @@ def _enrich_with_consumer_inflation(
         ValueError,
         json.JSONDecodeError,
     ):
-        latest_cpi = {
-            country_code: round(value, 1)
-            for country_code, value in WORLD_BANK_2024_LATEST_CPI_INFLATION_SNAPSHOT.items()
-        }
-        latest_cpi_year = WORLD_BANK_LATEST_CPI_INFLATION_YEAR
+        latest_cpi = OECD_LATEST_CPI_YOY_SNAPSHOT
+        latest_cpi_period = OECD_LATEST_CPI_YOY_PERIOD_SNAPSHOT
         is_inflation_fallback = True
+    latest_cpi_year = int(latest_cpi_period[:4])
 
     enriched = []
     for item in data:
@@ -593,9 +690,10 @@ def _enrich_with_consumer_inflation(
                 "consumerInflationIsForecast": True,
                 "latestCpiInflationRate": latest_cpi[country_code],
                 "latestCpiInflationYear": latest_cpi_year,
-                "latestCpiInflationSource": WORLD_BANK_LATEST_CPI_INFLATION_SOURCE,
+                "latestCpiInflationPeriod": latest_cpi_period,
+                "latestCpiInflationSource": OECD_G20_CPI_YOY_SOURCE,
                 "latestCpiInflationSourceDetail": (
-                    WORLD_BANK_LATEST_CPI_INFLATION_SOURCE_DETAIL
+                    OECD_G20_CPI_YOY_SOURCE_DETAIL
                 ),
             }
         )
@@ -605,6 +703,7 @@ def _enrich_with_consumer_inflation(
         IMF_CONSUMER_INFLATION_YEAR,
         is_forecast_fallback,
         latest_cpi_year,
+        latest_cpi_period,
         is_inflation_fallback,
     )
 
@@ -616,6 +715,7 @@ def _refresh_metadata(
     consumer_inflation_year: int,
     is_forecast_fallback: bool,
     latest_cpi_inflation_year: int,
+    latest_cpi_inflation_period: str,
     is_latest_cpi_fallback: bool,
 ) -> dict[str, object]:
     return {
@@ -642,15 +742,16 @@ def _refresh_metadata(
         "consumerInflationIsForecast": True,
         "consumerInflationIsFallback": is_forecast_fallback,
         "latestCpiInflationYear": latest_cpi_inflation_year,
-        "latestCpiInflationSource": WORLD_BANK_LATEST_CPI_INFLATION_SOURCE,
+        "latestCpiInflationPeriod": latest_cpi_inflation_period,
+        "latestCpiInflationSource": OECD_G20_CPI_YOY_SOURCE,
         "latestCpiInflationSourceUrl": (
-            "https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG"
+            "https://data-explorer.oecd.org/vis?df[ag]=OECD.SDD.TPS&df[id]=DSD_G20_PRICES%40DF_G20_PRICES"
         ),
-        "latestCpiInflationIndicatorCode": WORLD_BANK_LATEST_CPI_INFLATION_INDICATOR,
-        "latestCpiInflationIndicatorName": WORLD_BANK_LATEST_CPI_INFLATION_NAME,
+        "latestCpiInflationIndicatorCode": OECD_G20_CPI_YOY_INDICATOR,
+        "latestCpiInflationIndicatorName": OECD_G20_CPI_YOY_NAME,
         "latestCpiInflationMethodology": (
-            "World Bank latest observed annual consumer price inflation, percent "
-            "change; used as historical CPI trend context"
+            "OECD G20 monthly CPI all-items growth rate over 1 year, percent; "
+            "used as latest year-on-year CPI trend context"
         ),
         "latestCpiInflationIsFallback": is_latest_cpi_fallback,
     }
@@ -664,7 +765,8 @@ def save_to_json(
     is_api_fallback: bool = False,
     consumer_inflation_year: int = IMF_CONSUMER_INFLATION_YEAR,
     is_forecast_fallback: bool = False,
-    latest_cpi_inflation_year: int = WORLD_BANK_LATEST_CPI_INFLATION_YEAR,
+    latest_cpi_inflation_year: int = int(OECD_LATEST_CPI_YOY_PERIOD_SNAPSHOT[:4]),
+    latest_cpi_inflation_period: str = OECD_LATEST_CPI_YOY_PERIOD_SNAPSHOT,
     is_latest_cpi_fallback: bool = False,
 ) -> Path:
     output_path = Path(output_dir)
@@ -685,7 +787,7 @@ def save_to_json(
         "datasetType": DATASET_TYPE,
         "methodology": (
             "World Bank GDP price level index rebased so Korea equals 100; "
-            "IMF WEO CPI forecast and World Bank observed CPI inflation are "
+            "IMF WEO CPI forecast and OECD monthly CPI year-on-year inflation are "
             "supplementary trend context"
         ),
         **_refresh_metadata(
@@ -694,6 +796,7 @@ def save_to_json(
             consumer_inflation_year=consumer_inflation_year,
             is_forecast_fallback=is_forecast_fallback,
             latest_cpi_inflation_year=latest_cpi_inflation_year,
+            latest_cpi_inflation_period=latest_cpi_inflation_period,
             is_latest_cpi_fallback=is_latest_cpi_fallback,
         ),
     }
@@ -722,6 +825,7 @@ def main(*, require_live: bool = False) -> None:
         consumer_inflation_year,
         is_forecast_fallback,
         latest_cpi_inflation_year,
+        latest_cpi_inflation_period,
         is_latest_cpi_fallback,
     ) = _enrich_with_consumer_inflation(data)
     filename = save_to_json(
@@ -731,6 +835,7 @@ def main(*, require_live: bool = False) -> None:
         consumer_inflation_year=consumer_inflation_year,
         is_forecast_fallback=is_forecast_fallback,
         latest_cpi_inflation_year=latest_cpi_inflation_year,
+        latest_cpi_inflation_period=latest_cpi_inflation_period,
         is_latest_cpi_fallback=is_latest_cpi_fallback,
     )
     print(f"Wrote {filename}")

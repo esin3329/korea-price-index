@@ -90,6 +90,6 @@ pages_build_output_dir = "out"
 - World Bank `PA.NUS.PPPC.RF` remains the primary cross-country price-level measure. It is GDP-wide, so it is suitable for broad relative price-level comparison, but it is not a pure consumer basket or cost-of-living index.
 - `consumerInflationRate` keeps the IMF WEO April 2026 `PCPIPCH` 2026 annual average consumer price inflation forecast for every G20 country.
 - `consumerInflationVintage` and `consumerInflationPublicationDate` record the IMF WEO release basis (`April 2026`, published `2026-04-14`).
-- `latestCpiInflationRate` adds World Bank WDI `FP.CPI.TOTL.ZG`, the latest observed annual consumer price inflation rate available for every G20 country.
+- `latestCpiInflationRate` adds OECD G20 CPI `GY`, the latest monthly year-on-year CPI inflation rate available for each G20 country.
 - World Bank `PA.NUS.PPPC.RF` is still checked dynamically up to the current year; as of this refresh, the latest complete G20 World Bank price-level year remains 2024, so the dataset cannot yet be rebased to 2025.
 - Both CPI fields are change-rate supplements, not replacements for the World Bank price-level index.
