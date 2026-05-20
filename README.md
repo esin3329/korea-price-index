@@ -1,36 +1,54 @@
 # K-Collusion Index
 
-K-Collusion Index는 대한민국의 물가 수준을 100으로 두고 주요 G20 회원국의 상대적인 물가 수준을 비교하는 정적 대시보드입니다. 시간별 인플레이션률이 아니라 국가 간 가격 수준 차이를 보여주기 위해 PPP 기반 지표를 사용합니다.
+K-Collusion Index는 한국을 기준값 100으로 두고 G20 주요 국가의 전반적인 가격수준을 비교하는 정적 대시보드입니다.
 
-## 지표 검토 결과
+이 프로젝트는 물가 상승률 자체를 국가 간 가격수준 비교 지표로 쓰지 않습니다. 소비자물가지수(CPI) 상승률은 특정 기간의 변화 속도이고, “어느 나라의 전반적인 가격 수준이 더 높은가”를 직접 말해주지는 않기 때문입니다.
 
-기존 CPI annual rate는 각국의 연간 물가 상승률을 비교하는 지표라서 “어느 나라의 전반적인 물가 수준이 더 높은가”를 직접 비교하기에는 부적합합니다.
+## 핵심 지표
 
-현재 데이터는 World Bank WDI의 `PA.NUS.PPPC.RF` 지표를 사용합니다.
+기본 비교 지표는 World Bank WDI의 `PA.NUS.PPPC.RF`입니다.
 
 - 지표명: Price level ratio of PPP conversion factor (GDP) to market exchange rate
-- 의미: PPP conversion factor와 시장환율의 비율로 계산되는 국가별 가격수준 비율
-- 기준화: World Bank 원자료를 대한민국 값으로 나누어 `KOR = 100`으로 재산정
-- 최신 반영 연도: 2024년
-- 수집 경로: World Bank API를 우선 사용하고, 응답 장애 시 World Bank WDI를 동기화한 Autario 공개 API를 사용
-- 범위: World Bank country-level 데이터가 제공되는 G20 회원국 19개국
-- 제외: EU 집계는 같은 WDI country-level 지표로 일관되게 비교하기 어려워 제외
+- 의미: PPP conversion factor와 시장환율의 비율로 계산한 국가별 가격수준 비율
+- 재산정 방식: 각 국가 값을 한국 값으로 나누어 `KOR = 100`으로 변환
+- 해석: 숫자가 100보다 크면 한국보다 전반적인 가격수준이 높고, 100보다 작으면 낮습니다.
+- 현재 기준연도: World Bank가 G20 국가에 대해 완전하게 제공하는 최신 공통 연도
+
+## 보조 CPI 지표
+
+소비자물가지수(CPI)는 가격수준 순위를 계산하는 데 쓰지 않고, 물가 흐름을 설명하는 보조 지표로만 표시합니다.
+
+- `consumerInflationRate`: IMF WEO April 2026 `PCPIPCH` 기준 2026년 평균 소비자물가 상승률 전망
+- `latestCpiInflationRate`: OECD G20 Consumer Price Indices `GY` 기준 최신 월별 소비자물가지수(CPI) 전년동월비
+
+두 CPI 지표는 변화율입니다. 가격수준 지수와 단위와 의미가 다르므로, 순위 계산에는 포함하지 않습니다.
+
+## 데이터 흐름
+
+1. World Bank WDI API에서 가격수준 비율을 가져옵니다.
+2. 모든 G20 국가가 존재하는 최신 공통 연도를 선택합니다.
+3. 한국 값을 100으로 두고 모든 국가의 지수를 재계산합니다.
+4. IMF 전망과 OECD CPI 전년동월비를 보조 정보로 붙입니다.
+5. `public/data/k-collusion-index.json`을 생성합니다.
+
+World Bank API가 일시적으로 실패하면 Autario의 World Bank 동기화 미러를 시도합니다. 모든 온라인 경로가 실패할 때만 체크인된 WDI 스냅샷을 사용하며, 이 경우 JSON의 `isFallback` 값이 `true`가 됩니다.
 
 ## 주요 기능
 
-- 한국 기준 상대 물가 수준 지수 계산
-- 국가별 가격수준 막대 차트
-- 순위표와 한국 대비 차이 표시
-- CSV 다운로드와 JSON 다운로드
-- 데이터 출처, 기준 연도, fallback 여부 메타데이터 제공
+- 한국 기준 국제 가격수준 비교
+- 국가별 가격수준 순위 차트
+- 한국 대비 차이와 순위표
+- IMF 소비자물가지수(CPI) 전망과 OECD CPI 전년동월비 표시
+- CSV, JSON 다운로드
+- 데이터 출처, 기준연도, fallback 여부 메타데이터 표시
 
 ## 기술 스택
 
 - Frontend: Next.js App Router, React, TypeScript
 - Chart: Recharts
-- Data generation: Python 표준 라이브러리
+- Data generation: Python standard library
 - Hosting: Cloudflare Pages
-- Test: Playwright, pytest
+- Tests: pytest, Playwright
 
 ## 로컬 실행
 
@@ -39,7 +57,7 @@ npm install
 npm run dev
 ```
 
-브라우저에서 `http://localhost:3000` 또는 `http://localhost:3000/dashboard`로 확인합니다.
+브라우저에서 `http://localhost:3000/dashboard`를 엽니다.
 
 ## 데이터 생성
 
@@ -47,12 +65,10 @@ npm run dev
 python python/generate_data.py
 ```
 
-스크립트는 World Bank WDI API에서 최신 공통 연도의 `PA.NUS.PPPC.RF` 데이터를 가져오려고 시도합니다. World Bank API가 응답하지 않는 경우에는 World Bank WDI를 동기화한 Autario 공개 API를 사용하고, 모든 온라인 경로가 실패할 때만 체크인된 2024년 WDI 스냅샷을 사용해 동일한 JSON 구조를 생성합니다.
+온라인 데이터 소스가 반드시 성공해야 하는 환경에서는 다음 명령을 사용합니다.
 
-생성 파일:
-
-```text
-public/data/k-collusion-index.json
+```bash
+python python/generate_data.py --require-live
 ```
 
 ## 빌드
@@ -61,7 +77,7 @@ public/data/k-collusion-index.json
 npm run build
 ```
 
-`prebuild` 단계에서 데이터 파일을 생성한 뒤, Next.js가 `out` 디렉터리에 정적 사이트를 export합니다. Cloudflare Pages 프로젝트에 build command가 비어 있어도 배포가 가능하도록 현재 `out` 산출물도 저장소에 포함합니다.
+`prebuild` 단계에서 데이터 JSON을 생성하고, Next.js가 정적 사이트를 `out/`에 export합니다.
 
 ## 테스트
 
@@ -71,25 +87,17 @@ npm run lint
 npx playwright test
 ```
 
-## CI/CD
+## 배포
 
-- `.github/workflows/prebuild.yml`: 데이터 생성, Next.js 빌드, `out` 산출물 검증
-- `.github/workflows/cloudflare-pages.yml`: Cloudflare Pages 배포
-- `.github/workflows/weekly-data-update.yml`: 주간 데이터 재생성 및 변경 시 커밋
+Cloudflare Pages 배포는 GitHub Actions에서 `npm run build` 후 생성된 `out/` 디렉터리를 사용합니다.
 
-## 배포 설정
+필요한 repository secrets:
 
-Cloudflare Pages 산출물 경로는 `wrangler.toml`에서 `out`으로 지정합니다.
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`
 
-```toml
-pages_build_output_dir = "out"
-```
+## 한계
 
-## Consumer Inflation Context
-
-- World Bank `PA.NUS.PPPC.RF` remains the primary cross-country price-level measure. It is GDP-wide, so it is suitable for broad relative price-level comparison, but it is not a pure consumer basket or cost-of-living index.
-- `consumerInflationRate` keeps the IMF WEO April 2026 `PCPIPCH` 2026 annual average consumer price inflation forecast for every G20 country.
-- `consumerInflationVintage` and `consumerInflationPublicationDate` record the IMF WEO release basis (`April 2026`, published `2026-04-14`).
-- `latestCpiInflationRate` adds OECD G20 CPI `GY`, the latest monthly year-on-year CPI inflation rate available for each G20 country.
-- World Bank `PA.NUS.PPPC.RF` is still checked dynamically up to the current year; as of this refresh, the latest complete G20 World Bank price-level year remains 2024, so the dataset cannot yet be rebased to 2025.
-- Both CPI fields are change-rate supplements, not replacements for the World Bank price-level index.
+- World Bank `PA.NUS.PPPC.RF`는 GDP 전체 가격수준 비율입니다. 소비자 장바구니만을 직접 비교하는 생활비 지수는 아닙니다.
+- G20 중 EU 집계는 country-level WDI 지표와 일관되게 비교하기 어려워 제외합니다.
+- 소비자물가지수(CPI) 전망과 전년동월비는 물가 흐름 참고용이며 가격수준 지수를 대체하지 않습니다.

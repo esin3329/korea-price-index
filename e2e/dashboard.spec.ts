@@ -44,6 +44,15 @@ test.describe("K-Collusion Index Dashboard", () => {
     await expect(metrics.getByText(/소비자물가지수\(CPI\) 전년동월비/)).toBeVisible();
   });
 
+  test("가격수준 지수와 소비자물가지수 설명을 구분해 보여준다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByRole("heading", { name: "가격수준 지수" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "소비자물가지수(CPI)" })).toBeVisible();
+    await expect(page.getByText(/가격수준 지수는 국가 간 가격 수준을 비교/)).toBeVisible();
+    await expect(page.getByText(/소비자물가지수\(CPI\)는 물가 상승 속도/)).toBeVisible();
+  });
+
   test("차트와 순위표가 표시된다", async ({ page }) => {
     await page.goto("/dashboard");
 

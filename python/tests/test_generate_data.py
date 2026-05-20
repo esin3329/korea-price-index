@@ -7,6 +7,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import generate_data
+import inflation_sources
+import world_bank_source
 
 
 def _world_bank_rows(missing: set[str] | None = None) -> list[dict[str, object]]:
@@ -31,7 +33,7 @@ def _world_bank_rows(missing: set[str] | None = None) -> list[dict[str, object]]
 
 def test_partial_world_bank_response_raises(monkeypatch):
     monkeypatch.setattr(
-        generate_data,
+        world_bank_source,
         "_read_world_bank_json",
         lambda _url: _world_bank_rows({"GBR", "DEU", "FRA"}),
     )
@@ -42,17 +44,17 @@ def test_partial_world_bank_response_raises(monkeypatch):
 
 def test_full_world_bank_response_has_official_metadata(monkeypatch, tmp_path):
     monkeypatch.setattr(
-        generate_data,
+        world_bank_source,
         "_read_world_bank_json",
         lambda _url: _world_bank_rows(),
     )
     monkeypatch.setattr(
-        generate_data,
+        inflation_sources,
         "_read_imf_consumer_inflation_forecast",
         lambda: generate_data.IMF_2026_CONSUMER_INFLATION_SNAPSHOT,
     )
     monkeypatch.setattr(
-        generate_data,
+        inflation_sources,
         "_read_oecd_latest_cpi_yoy_inflation",
         lambda: (
             {

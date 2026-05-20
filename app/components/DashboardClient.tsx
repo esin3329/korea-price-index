@@ -356,6 +356,25 @@ export default function DashboardClient() {
         />
       </section>
 
+      <section className={styles.contextGrid} aria-label="지표 해석">
+        <div className={styles.contextPanel}>
+          <h3>가격수준 지수</h3>
+          <p>
+            가격수준 지수는 국가 간 가격 수준을 비교하기 위한 지표입니다. World
+            Bank WDI의 PPP 기반 가격수준 비율을 한국=100으로 재산정해, 숫자가
+            높을수록 한국보다 전반적인 가격 수준이 높다는 뜻입니다.
+          </p>
+        </div>
+        <div className={styles.contextPanel}>
+          <h3>소비자물가지수(CPI)</h3>
+          <p>
+            소비자물가지수(CPI)는 물가 상승 속도를 보여주는 보조 지표입니다.
+            IMF 전망은 향후 연간 물가 흐름, OECD 전년동월비는 최근 월별 상승률을
+            설명하며 가격수준 순위 계산에는 사용하지 않습니다.
+          </p>
+        </div>
+      </section>
+
       <section className={styles.panel}>
         <div className={styles.sectionHeader}>
           <h3>물가 수준 지수 비교</h3>
