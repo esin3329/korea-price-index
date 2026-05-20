@@ -1,14 +1,14 @@
-name: Weekly K-Collusion Data Update
+name: Monthly K-Collusion Data Update
 
 on:
   schedule:
-    # weekly: Sunday 06:00 UTC
-    - cron: '0 6 * * 0'
+    # monthly: 15th day 06:00 UTC
+    - cron: '0 6 15 * *'
   workflow_dispatch: {}
 
 jobs:
   update-data:
-    name: Regenerate and commit data (weekly)
+    name: Regenerate and commit data (monthly)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -89,4 +89,4 @@ jobs:
 
       - name: Final status
         run: |
-          if [ "${{ steps.check.outputs.changed }}" = 'true' ]; then echo "Committed and pushed updated data file"; else echo "No changes — nothing to commit"; fi
+          if [ "${{ steps.check.outputs.changed }}" = 'true' ]; then echo "Committed and pushed updated data file"; else echo "No changes - nothing to commit"; fi
