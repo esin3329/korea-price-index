@@ -1,10 +1,10 @@
-import DashboardClient from "@/app/components/DashboardClient";
+import Home from "../page";
 
 export const metadata = {
-  title: "Dashboard | Korea Price Index",
-  description: "G20 economies compared through Korea-based price-level indicators.",
+  title: "Dashboard | K-Collusion Index",
+  description: "Korean consumer price distortion signal dashboard",
 };
 
 export default function DashboardPage() {
-  return <DashboardClient />;
+  return <Home />;
 }
