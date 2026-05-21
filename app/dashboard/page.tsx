@@ -1,8 +1,8 @@
 import DashboardClient from "@/app/components/DashboardClient";
 
 export const metadata = {
-  title: "Dashboard | K-Collusion Index",
-  description: "G20 countries compared against Korea's relative price index.",
+  title: "Dashboard | Korea Price Index",
+  description: "G20 economies compared through Korea-based price-level indicators.",
 };
 
 export default function DashboardPage() {

@@ -42,6 +42,13 @@
   line-height: 1.65;
 }
 
+.kicker {
+  margin-top: 0.9rem;
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
 .refreshStatus {
   flex: 0 0 auto;
   display: flex;
@@ -49,6 +56,19 @@
   flex-direction: column;
   gap: 0.45rem;
   align-items: flex-end;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  font-size: 0.8rem;
+  font-weight: 900;
 }
 
 .updated {
@@ -135,6 +155,61 @@
   line-height: 1.65;
 }
 
+.insights {
+  padding: 1.25rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.3);
+}
+
+.insightGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.insightCard {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.insightCard strong {
+  display: block;
+  margin-top: 0.38rem;
+  color: var(--foreground);
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.insightCard p {
+  margin-top: 0.45rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.insightLabel {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.insight-warn {
+  border-top: 3px solid #f87171;
+}
+
+.insight-info {
+  border-top: 3px solid #38bdf8;
+}
+
+.insight-hot {
+  border-top: 3px solid #f59e0b;
+}
+
 .panel {
   padding: 1.25rem;
   border: 1px solid var(--border-glass);
@@ -162,6 +237,83 @@
   color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+.chartTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.chartTab {
+  min-height: 38px;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.activeChartTab,
+.chartTab:hover,
+.chartTab:focus-visible {
+  border-color: transparent;
+  background: var(--gradient-primary);
+  color: #ffffff;
+}
+
+.detailPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.detailPanel h3 {
+  color: var(--foreground);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.detailPanel p {
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.detailStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.detailStats div {
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: rgba(10, 14, 26, 0.32);
+}
+
+.detailStats dt {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.detailStats dd {
+  margin-top: 0.25rem;
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 900;
 }
 
 .actions {
@@ -232,7 +384,9 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .contextGrid {
+  .contextGrid,
+  .insightGrid,
+  .detailPanel {
     grid-template-columns: 1fr;
   }
 }

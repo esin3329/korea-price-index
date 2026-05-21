@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "K-Collusion Index",
-  description: "Compare Korea's relative price index with G20 economies.",
+  title: "Korea Price Index",
+  description: "Compare Korea-based price-level indicators with G20 economies.",
 };
 
 export default function RootLayout({

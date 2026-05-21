@@ -5,9 +5,20 @@ import styles from "./RankingTable.module.css";
 
 interface RankingTableProps {
   data: ChartDataItem[];
+  onSelectCountry?: (countryCode: string) => void;
 }
 
-export default function RankingTable({ data }: RankingTableProps) {
+function levelClass(value: number) {
+  if (value >= 120) {
+    return styles.high;
+  }
+  if (value >= 90) {
+    return styles.mid;
+  }
+  return styles.low;
+}
+
+export default function RankingTable({ data, onSelectCountry }: RankingTableProps) {
   const sortedData = [...data].sort((a, b) => a.rank - b.rank);
 
   return (
@@ -29,6 +40,7 @@ export default function RankingTable({ data }: RankingTableProps) {
             <th scope="col" className={styles.numeric}>
               소비자물가지수(CPI) 전년동월비
             </th>
+            {onSelectCountry && <th scope="col">상세</th>}
           </tr>
         </thead>
         <tbody>
@@ -51,7 +63,11 @@ export default function RankingTable({ data }: RankingTableProps) {
                     <span className={styles.badge}>기준</span>
                   )}
                 </td>
-                <td className={styles.numeric}>{item.value.toFixed(1)}</td>
+                <td className={styles.numeric}>
+                  <span className={`${styles.indexBadge} ${levelClass(item.value)}`}>
+                    {item.value.toFixed(1)}
+                  </span>
+                </td>
                 <td
                   className={`${styles.numeric} ${
                     difference > 0
@@ -69,6 +85,17 @@ export default function RankingTable({ data }: RankingTableProps) {
                 <td className={styles.numeric}>
                   {item.latestCpiInflationRate.toFixed(1)}%
                 </td>
+                {onSelectCountry && (
+                  <td>
+                    <button
+                      type="button"
+                      className={styles.detailButton}
+                      onClick={() => onSelectCountry(item.countryCode)}
+                    >
+                      {item.name} 상세 보기
+                    </button>
+                  </td>
+                )}
               </tr>
             );
           })}

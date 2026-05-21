@@ -9,8 +9,8 @@ export default function DashboardLayout({
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>K-Collusion Index</h1>
-        <p className={styles.subtitle}>한국 물가의 상대 수준을 G20 국가와 비교합니다.</p>
+        <h1 className={styles.title}>Korea Price Index</h1>
+        <p className={styles.subtitle}>한국 기준 글로벌 가격수준 비교 대시보드</p>
       </header>
       <nav className={styles.nav}>
         <ul className={styles.navList}>

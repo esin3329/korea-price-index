@@ -7,7 +7,7 @@
 
 .table {
   width: 100%;
-  min-width: 780px;
+  min-width: 920px;
   border-collapse: collapse;
   color: var(--foreground);
   font-size: 0.94rem;
@@ -57,6 +57,11 @@
 .table th:nth-child(6),
 .table td:nth-child(6) {
   width: 8.75rem;
+}
+
+.table th:nth-child(7),
+.table td:nth-child(7) {
+  width: 9.5rem;
 }
 
 .table tr:last-child td {
@@ -126,6 +131,50 @@
 .base {
   color: #93c5fd;
   font-weight: 800;
+}
+
+.indexBadge {
+  display: inline-flex;
+  justify-content: flex-end;
+  min-width: 4.4rem;
+  padding: 0.18rem 0.52rem;
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.high {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fca5a5;
+}
+
+.mid {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fcd34d;
+}
+
+.low {
+  background: rgba(16, 185, 129, 0.14);
+  color: #6ee7b7;
+}
+
+.detailButton {
+  min-height: 34px;
+  padding: 0.38rem 0.62rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--foreground);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.detailButton:hover,
+.detailButton:focus-visible {
+  border-color: rgba(59, 130, 246, 0.45);
+  background: rgba(59, 130, 246, 0.14);
 }
 
 @media (max-width: 520px) {

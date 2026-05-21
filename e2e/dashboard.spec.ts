@@ -22,14 +22,26 @@ type IndexDataItem = {
   latestCpiInflationSourceDetail: string;
 };
 
-test.describe("K-Collusion Index Dashboard", () => {
+test.describe("Korea Price Index Dashboard", () => {
   test("대시보드 페이지가 정상적으로 로드된다", async ({ page }) => {
     await page.goto("/dashboard");
 
-    await expect(page).toHaveTitle(/K-Collusion Index/);
+    await expect(page).toHaveTitle(/Korea Price Index/);
     await expect(
-      page.getByRole("heading", { name: "한국 기준 국제 물가 수준 비교" }),
+      page.getByRole("heading", { name: "Korea Price Index", level: 1 }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("banner").getByText("한국 기준 글로벌 가격수준 비교 대시보드"),
+    ).toBeVisible();
+  });
+
+  test("데이터 신뢰 상태와 기준 정보를 상단에서 확인할 수 있다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByText("공식 데이터", { exact: true })).toBeVisible();
+    await expect(page.getByText(/기준연도 2024/)).toBeVisible();
+    await expect(page.getByText(/CPI 기준월 2026-04/)).toBeVisible();
+    await expect(page.getByText(/월간 갱신/)).toBeVisible();
   });
 
   test("통계 요약이 표시된다", async ({ page }) => {
@@ -51,6 +63,41 @@ test.describe("K-Collusion Index Dashboard", () => {
     await expect(page.getByRole("heading", { name: "소비자물가지수(CPI)" })).toBeVisible();
     await expect(page.getByText(/가격수준 지수는 국가 간 가격 수준을 비교/)).toBeVisible();
     await expect(page.getByText(/소비자물가지수\(CPI\)는 물가 상승 속도/)).toBeVisible();
+  });
+
+  test("탭으로 가격수준, 최신 CPI, IMF 전망 차트를 전환한다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByRole("button", { name: "가격수준" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    await page.getByRole("button", { name: "최신 CPI" }).click();
+    await expect(page.getByRole("button", { name: "최신 CPI" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.getByText("OECD G20 월간 CPI 전년동월비")).toBeVisible();
+
+    await page.getByRole("button", { name: "IMF 전망" }).click();
+    await expect(page.getByRole("button", { name: "IMF 전망" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.getByText("IMF WEO 2026 연평균 소비자물가 전망")).toBeVisible();
+  });
+
+  test("핵심 인사이트와 국가 상세 해석을 제공한다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByRole("heading", { name: "핵심 인사이트" })).toBeVisible();
+    await expect(page.getByText(/한국보다 가격수준이 높은 국가는/)).toBeVisible();
+
+    await page.getByRole("button", { name: /미국 상세 보기/ }).click();
+    await expect(page.getByRole("heading", { name: "미국 상세 해석" })).toBeVisible();
+    await expect(page.getByText(/미국의 가격수준 지수는 168.5/)).toBeVisible();
+    await expect(page.getByText(/한국보다 68.5포인트 높습니다/)).toBeVisible();
   });
 
   test("차트와 순위표가 표시된다", async ({ page }) => {
