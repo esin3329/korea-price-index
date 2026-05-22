@@ -1,31 +1,211 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from "@playwright/test";
 
-test.describe('K-Collusion Index dashboard', () => {
-  test('renders the approved dashboard on the homepage', async ({ page }) => {
-    await page.goto('/');
+type IndexDataItem = {
+  countryCode: string;
+  countryName: string;
+  indexValue: number;
+  baseYear: number;
+  source: string;
+  sourceDetail: string;
+  rawPriceLevelRatio: number;
+  consumerInflationRate: number;
+  consumerInflationYear: number;
+  consumerInflationSource: string;
+  consumerInflationSourceDetail: string;
+  consumerInflationVintage: string;
+  consumerInflationPublicationDate: string;
+  consumerInflationIsForecast: boolean;
+  latestCpiInflationRate: number;
+  latestCpiInflationYear: number;
+  latestCpiInflationPeriod: string;
+  latestCpiInflationSource: string;
+  latestCpiInflationSourceDetail: string;
+};
 
-    await expect(page).toHaveTitle(/K-Collusion Index/);
-    await expect(page.getByRole('heading', { name: 'Korean consumer price distortion signal' })).toBeVisible();
-    await expect(page.getByText('A composite dashboard that combines Numbeo cost-of-living indicators')).toBeVisible();
-    await expect(page.getByText('This index does not legally determine collusion.')).toBeVisible();
+test.describe("Korea Price Index Dashboard", () => {
+  test("대시보드 페이지가 정상적으로 로드된다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page).toHaveTitle(/Korea Price Index/);
+    await expect(
+      page.getByRole("heading", { name: "Korea Price Index", level: 1 }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("banner").getByText("한국 기준 글로벌 가격수준 비교 대시보드"),
+    ).toBeVisible();
   });
 
-  test('renders category scores and source methodology', async ({ page }) => {
-    await page.goto('/');
+  test("데이터 신뢰 상태와 기준 정보를 상단에서 확인할 수 있다", async ({ page }) => {
+    await page.goto("/dashboard");
 
-    await expect(page.getByRole('heading', { name: 'Category K-Collusion Score' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Formula and limits' })).toBeVisible();
-    await expect(page.getByText('Restaurant meals')).toBeVisible();
-    await expect(page.getByText('OECD PPP price level')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Numbeo Cost of Living 2026' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'OECD Inflation CPI' })).toBeVisible();
+    await expect(page.getByText("공식 데이터", { exact: true })).toBeVisible();
+    await expect(page.getByText(/기준연도 2024/)).toBeVisible();
+    await expect(page.getByText(/CPI 기준월 2026-04/)).toBeVisible();
+    await expect(page.getByText(/월간 갱신/)).toBeVisible();
   });
 
-  test('keeps the dashboard route aligned with the homepage', async ({ page }) => {
-    await page.goto('/dashboard');
+  test("통계 요약이 표시된다", async ({ page }) => {
+    await page.goto("/dashboard");
 
-    await expect(page.getByRole('heading', { name: 'Korean consumer price distortion signal' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Country cost-pressure comparison' })).toBeVisible();
-    await expect(page.getByText('Korea = 100')).toBeVisible();
+    await expect(page.getByText("기준 국가")).toBeVisible();
+    await expect(page.getByText("평균 지수")).toBeVisible();
+    await expect(page.getByText("가장 높은 물가 수준")).toBeVisible();
+    await expect(page.getByText("가장 낮은 물가 수준")).toBeVisible();
+    const metrics = page.getByLabel("핵심 지표");
+    await expect(metrics.getByText("2026 소비자물가지수(CPI) 전망")).toBeVisible();
+    await expect(metrics.getByText(/소비자물가지수\(CPI\) 전년동월비/)).toBeVisible();
+  });
+
+  test("가격수준 지수와 소비자물가지수 설명을 구분해 보여준다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByRole("heading", { name: "가격수준 지수" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "소비자물가지수(CPI)" })).toBeVisible();
+    await expect(page.getByText(/가격수준 지수는 국가 간 가격 수준을 비교/)).toBeVisible();
+    await expect(page.getByText(/소비자물가지수\(CPI\)는 물가 상승 속도/)).toBeVisible();
+  });
+
+  test("탭으로 가격수준, 최신 CPI, IMF 전망 차트를 전환한다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByRole("button", { name: "가격수준" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    await page.getByRole("button", { name: "최신 CPI" }).click();
+    await expect(page.getByRole("button", { name: "최신 CPI" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.getByText("OECD G20 월간 CPI 전년동월비")).toBeVisible();
+
+    await page.getByRole("button", { name: "IMF 전망" }).click();
+    await expect(page.getByRole("button", { name: "IMF 전망" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.getByText("IMF WEO 2026 연평균 소비자물가 전망")).toBeVisible();
+  });
+
+  test("핵심 인사이트와 국가 상세 해석을 제공한다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByRole("heading", { name: "핵심 인사이트" })).toBeVisible();
+    await expect(page.getByText(/한국보다 가격수준이 높은 국가는/)).toBeVisible();
+
+    await page.getByRole("button", { name: /미국 상세 보기/ }).click();
+    await expect(page.getByRole("heading", { name: "미국 상세 해석" })).toBeVisible();
+    await expect(page.getByText(/미국의 가격수준 지수는 168.5/)).toBeVisible();
+    await expect(page.getByText(/한국보다 68.5포인트 높습니다/)).toBeVisible();
+  });
+
+  test("차트와 순위표가 표시된다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByText("물가 수준 지수 비교")).toBeVisible();
+    await expect(page.locator(".recharts-wrapper")).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByText("국가별 순위")).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "2026 소비자물가지수(CPI) 전망" })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "소비자물가지수(CPI) 전년동월비" })).toBeVisible();
+
+    const rows = page.locator("table tbody tr");
+    await expect(rows).toHaveCount(19);
+  });
+
+  test("대한민국은 기준 지수 100으로 표시된다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    const koreaRow = page.locator("table tbody tr", { hasText: "대한민국" });
+    await expect(koreaRow).toContainText("100.0");
+    await expect(koreaRow).toContainText("기준");
+  });
+
+  test("정적 JSON 데이터 파일이 올바른 공식 데이터 구조를 가진다", async ({ page }) => {
+    const response = await page.request.get("/data/k-collusion-index.json");
+    expect(response.ok()).toBeTruthy();
+
+    const json = await response.json();
+    expect(json.success).toBe(true);
+    expect(Array.isArray(json.data)).toBe(true);
+    expect(json.data).toHaveLength(19);
+    expect(json.expectedCountryCount).toBe(19);
+    expect(json.officialCountryCount).toBe(19);
+    expect(json.missingCountries).toEqual([]);
+    expect(json.hasIncompleteOfficialPull).toBe(false);
+    expect(json.isFallback).toEqual(expect.any(Boolean));
+    expect(json.source).toBe("World Bank WDI");
+    expect(json.indicatorCode).toBe("PA.NUS.PPPC.RF");
+    expect(json.consumerInflationYear).toBe(2026);
+    expect(json.consumerInflationSource).toBe(
+      "IMF World Economic Outlook (April 2026)",
+    );
+    expect(json.consumerInflationIndicatorCode).toBe("PCPIPCH");
+    expect(json.consumerInflationVintage).toBe("April 2026");
+    expect(json.consumerInflationPublicationDate).toBe("2026-04-14");
+    expect(json.consumerInflationIsForecast).toBe(true);
+    expect(json.latestCpiInflationYear).toBe(2026);
+    expect(json.latestCpiInflationPeriod).toMatch(/^\d{4}-\d{2}$/);
+    expect(json.latestCpiInflationSource).toBe("OECD G20 Consumer Price Indices");
+    expect(json.latestCpiInflationIndicatorCode).toBe("GY");
+    expect(json.datasetType).toBe(
+      "PRICE_LEVEL_RATIO_GDP_PPP_TO_MARKET_EXCHANGE_RATE",
+    );
+
+    const firstItem = json.data[0] as IndexDataItem;
+    expect(firstItem.countryCode).toBeDefined();
+    expect(firstItem.countryName).toBeDefined();
+    expect(firstItem.indexValue).toEqual(expect.any(Number));
+    expect(firstItem.baseYear).toEqual(expect.any(Number));
+    expect(firstItem.source).toBe("World Bank WDI");
+    expect(firstItem.sourceDetail).toBe("world_bank_wdi:PA.NUS.PPPC.RF");
+    expect(firstItem.rawPriceLevelRatio).toEqual(expect.any(Number));
+    expect(firstItem.consumerInflationRate).toEqual(expect.any(Number));
+    expect(firstItem.consumerInflationYear).toBe(2026);
+    expect(firstItem.consumerInflationSource).toBe(
+      "IMF World Economic Outlook (April 2026)",
+    );
+    expect(firstItem.consumerInflationSourceDetail).toBe("imf_weo:PCPIPCH");
+    expect(firstItem.consumerInflationVintage).toBe("April 2026");
+    expect(firstItem.consumerInflationPublicationDate).toBe("2026-04-14");
+    expect(firstItem.consumerInflationIsForecast).toBe(true);
+    expect(firstItem.latestCpiInflationRate).toEqual(expect.any(Number));
+    expect(firstItem.latestCpiInflationYear).toBe(2026);
+    expect(firstItem.latestCpiInflationPeriod).toMatch(/^\d{4}-\d{2}$/);
+    expect(firstItem.latestCpiInflationSource).toBe(
+      "OECD G20 Consumer Price Indices",
+    );
+    expect(firstItem.latestCpiInflationSourceDetail).toBe(
+      "oecd_g20_prices:GY",
+    );
+
+    const koreaData = json.data.find(
+      (item: IndexDataItem) => item.countryCode === "KOR",
+    );
+    expect(koreaData).toBeDefined();
+    expect(koreaData.indexValue).toBe(100);
+    expect(koreaData.consumerInflationRate).toBe(2.5);
+    expect(koreaData.latestCpiInflationRate).toBe(2.6);
+  });
+
+  test("완전한 공식 데이터에서는 누락 경고를 표시하지 않는다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    const response = await page.request.get("/data/k-collusion-index.json");
+    const json = await response.json();
+
+    expect(json.hasIncompleteOfficialPull).toBe(false);
+  });
+
+  test("CSV와 JSON 다운로드 동선이 제공된다", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    await expect(page.getByRole("button", { name: "CSV 다운로드" })).toBeVisible();
+
+    const jsonLink = page.getByRole("link", { name: "JSON 다운로드" });
+    await expect(jsonLink).toBeVisible();
+    await expect(jsonLink).toHaveAttribute("href", "/data/k-collusion-index.json");
   });
 });

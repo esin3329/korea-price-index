@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "K-Collusion Index",
-  description:
-    "A Numbeo and OECD based dashboard for Korean consumer price distortion signals.",
+  title: "Korea Price Index",
+  description: "Compare Korea-based price-level indicators with G20 economies.",
 };
 
 export default function RootLayout({
@@ -13,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body>{children}</body>
     </html>
   );
