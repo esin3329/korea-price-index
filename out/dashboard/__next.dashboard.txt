@@ -1,6 +1,5 @@
 1:"$Sreact.fragment"
-2:I[22016,["/_next/static/chunks/01xlw8hd842-c.js","/_next/static/chunks/0n4z.7yu76je-.js","/_next/static/chunks/0ka051yepewro.js"],""]
-3:I[39756,["/_next/static/chunks/01xlw8hd842-c.js","/_next/static/chunks/0n4z.7yu76je-.js"],"default"]
-4:I[37457,["/_next/static/chunks/01xlw8hd842-c.js","/_next/static/chunks/0n4z.7yu76je-.js"],"default"]
-:HL["/_next/static/chunks/06u5y6i0h-q4x.css","style"]
-0:{"rsc":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/06u5y6i0h-q4x.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/0ka051yepewro.js","async":true}]],["$","div",null,{"className":"layout-module__TTENja__container","children":[["$","header",null,{"className":"layout-module__TTENja__header","children":[["$","h1",null,{"className":"layout-module__TTENja__title","children":"Korea Price Index"}],["$","p",null,{"className":"layout-module__TTENja__subtitle","children":"한국 기준 글로벌 가격수준 비교 대시보드"}]]}],["$","nav",null,{"className":"layout-module__TTENja__nav","children":["$","ul",null,{"className":"layout-module__TTENja__navList","children":[["$","li",null,{"children":["$","$L2",null,{"href":"/dashboard","className":"layout-module__TTENja__navItem","children":"대시보드"}]}],["$","li",null,{"children":["$","a",null,{"href":"/data/k-collusion-index.json","className":"layout-module__TTENja__navItem","children":"원본 JSON"}]}]]}]}],["$","main",null,{"className":"layout-module__TTENja__main","children":["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}]}]}]]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"HWdKk8DzBzxRpTQedy1Wz"}
+2:I[39756,["/_next/static/chunks/13h-0fd.p-1ga.js","/_next/static/chunks/0n4z.7yu76je-.js"],"default"]
+3:I[37457,["/_next/static/chunks/13h-0fd.p-1ga.js","/_next/static/chunks/0n4z.7yu76je-.js"],"default"]
+4:[]
+0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"yriyWkX9Bp1pCqRdjVMJQ"}

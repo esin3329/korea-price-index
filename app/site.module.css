@@ -13,10 +13,18 @@
   backdrop-filter: blur(16px);
 }
 
-.title {
+.brand {
+  display: inline-flex;
+  color: var(--foreground);
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.brandHeading {
   margin: 0;
+  font-size: inherit;
+  line-height: 1.2;
 }
 
 .subtitle {
@@ -34,10 +42,11 @@
 
 .navList {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem;
 }
 
 .navItem {
@@ -45,9 +54,11 @@
   align-items: center;
   min-height: 40px;
   color: var(--text-secondary);
+  font-size: 0.92rem;
+  font-weight: 600;
   text-decoration: none;
-  font-weight: 500;
   transition: color 0.2s ease;
+  white-space: nowrap;
 }
 
 .navItem:hover {
@@ -66,16 +77,19 @@
   .header {
     padding: 1rem;
   }
-  
+
   .nav {
     padding: 0.45rem 1rem;
   }
-  
+
   .navList {
-    gap: 1rem;
-    flex-wrap: wrap;
+    gap: 0.25rem 0.9rem;
   }
-  
+
+  .navItem {
+    font-size: 0.86rem;
+  }
+
   .main {
     padding: 1rem;
   }
