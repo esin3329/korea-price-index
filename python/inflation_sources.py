@@ -120,7 +120,7 @@ def _read_oecd_latest_cpi_yoy_inflation(
     with urlopen(request, timeout=30) as response:
         text = response.read().decode("utf-8")
 
-    latest_by_country: dict[str, tuple[str, float]] = {}
+    values_by_period: dict[str, dict[str, float]] = {}
     reader = csv.DictReader(io.StringIO(text.lstrip("\ufeff")))
     for row in reader:
         country_code = row.get("REF_AREA")
@@ -132,19 +132,23 @@ def _read_oecd_latest_cpi_yoy_inflation(
             value = float(raw_value)
         except ValueError:
             continue
-        existing = latest_by_country.get(country_code)
-        if existing is None or time_period > existing[0]:
-            latest_by_country[country_code] = (time_period, value)
+        values_by_period.setdefault(time_period, {})[country_code] = value
 
-    missing = [code for code in G20_COUNTRIES if code not in latest_by_country]
-    if missing:
+    required = set(G20_COUNTRIES)
+    common_periods = [
+        period
+        for period, values in values_by_period.items()
+        if required.issubset(values.keys())
+    ]
+    if not common_periods:
         raise InflationDataUnavailableError(
-            f"OECD G20 CPI YoY missing values: {', '.join(missing)}"
+            "OECD G20 CPI YoY contains no common period for every country"
         )
 
-    latest_period = max(period for period, _value in latest_by_country.values())
+    latest_period = max(common_periods)
+    latest_values = values_by_period[latest_period]
     return {
-        country_code: round(latest_by_country[country_code][1], 1)
+        country_code: round(latest_values[country_code], 1)
         for country_code in G20_COUNTRIES
     }, latest_period
 

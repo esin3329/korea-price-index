@@ -56,6 +56,59 @@
   margin-top: 0.75rem;
 }
 
+.linkGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.linkGrid a {
+  display: grid;
+  gap: 0.3rem;
+  min-height: 96px;
+  padding: 0.85rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  background: rgba(10, 14, 26, 0.32);
+}
+
+.linkGrid a:hover,
+.linkGrid a:focus-visible {
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.linkGrid strong {
+  color: var(--foreground);
+  font-size: 1rem;
+}
+
+.linkGrid span {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.sourceLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.sourceLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 8px;
+  color: var(--accent-cyan);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
 @media (max-width: 768px) {
   .page h2 {
     font-size: 2rem;
@@ -63,5 +116,9 @@
 
   .section {
     padding: 1rem;
+  }
+
+  .linkGrid {
+    grid-template-columns: 1fr;
   }
 }

@@ -26,7 +26,7 @@ export default function RankingTable({ data, onSelectCountry }: RankingTableProp
       <table className={styles.table}>
         <thead>
           <tr>
-            <th scope="col">순위</th>
+            <th scope="col">표시 순서</th>
             <th scope="col">국가</th>
             <th scope="col" className={styles.numeric}>
               지수

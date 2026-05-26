@@ -176,3 +176,28 @@ def test_oecd_g20_cpi_url_requests_monthly_year_over_year_growth():
     assert "startPeriod=2026-04" in url
     assert "endPeriod=2026-04" in url
     assert "format=csvfilewithlabels" in url
+
+
+def test_oecd_latest_cpi_uses_latest_common_period(monkeypatch):
+    rows = ["REF_AREA,TIME_PERIOD,OBS_VALUE"]
+    for country_code in generate_data.G20_COUNTRIES:
+        rows.append(f"{country_code},2026-04,2.0")
+    rows.append("USA,2026-05,9.9")
+    csv_payload = ("\n".join(rows) + "\n").encode("utf-8")
+
+    class Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return csv_payload
+
+    monkeypatch.setattr(inflation_sources, "urlopen", lambda *_args, **_kwargs: Response())
+
+    values, period = inflation_sources._read_oecd_latest_cpi_yoy_inflation("2026-05")
+
+    assert period == "2026-04"
+    assert values["USA"] == 2.0

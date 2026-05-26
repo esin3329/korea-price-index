@@ -42,15 +42,23 @@ test.describe("Korea Price Index Dashboard", () => {
     await expect(page.getByText(/기준연도 2024/)).toBeVisible();
     await expect(page.getByText(/CPI 기준월 2026-04/)).toBeVisible();
     await expect(page.getByText(/월간 갱신/)).toBeVisible();
+
+    const response = await page.request.get("/data/k-collusion-index.json");
+    const json = await response.json();
+    if (json.latestCpiInflationIsFallback) {
+      await expect(page.getByRole("status")).toContainText(
+        "OECD CPI는 공통 월 스냅샷 사용",
+      );
+    }
   });
 
   test("통계 요약이 표시된다", async ({ page }) => {
     await page.goto("/dashboard");
 
     await expect(page.getByText("기준 국가")).toBeVisible();
-    await expect(page.getByText("평균 지수")).toBeVisible();
-    await expect(page.getByText("가장 높은 물가 수준")).toBeVisible();
-    await expect(page.getByText("가장 낮은 물가 수준")).toBeVisible();
+    await expect(page.getByText("19개국 단순평균")).toBeVisible();
+    await expect(page.getByText("가장 높은 GDP 가격수준")).toBeVisible();
+    await expect(page.getByText("가장 낮은 GDP 가격수준")).toBeVisible();
     const metrics = page.getByLabel("핵심 지표");
     await expect(metrics.getByText("2026 소비자물가지수(CPI) 전망")).toBeVisible();
     await expect(metrics.getByText(/소비자물가지수\(CPI\) 전년동월비/)).toBeVisible();
@@ -59,9 +67,9 @@ test.describe("Korea Price Index Dashboard", () => {
   test("가격수준 지수와 소비자물가지수 설명을 구분해 보여준다", async ({ page }) => {
     await page.goto("/dashboard");
 
-    await expect(page.getByRole("heading", { name: "가격수준 지수" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "GDP 기준 일반 가격수준 지수" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "소비자물가지수(CPI)" })).toBeVisible();
-    await expect(page.getByText(/가격수준 지수는 국가 간 가격 수준을 비교/)).toBeVisible();
+    await expect(page.getByText(/GDP 기준 일반 가격수준 지수는 국가 경제 전체의 상대적 가격수준을 비교/)).toBeVisible();
     await expect(page.getByText(/소비자물가지수\(CPI\)는 물가 상승 속도/)).toBeVisible();
   });
 
@@ -96,18 +104,20 @@ test.describe("Korea Price Index Dashboard", () => {
 
     await page.getByRole("button", { name: /미국 상세 보기/ }).click();
     await expect(page.getByRole("heading", { name: "미국 상세 해석" })).toBeVisible();
-    await expect(page.getByText(/미국의 가격수준 지수는 168.5/)).toBeVisible();
+    await expect(page.getByText(/미국의 GDP 기준 일반 가격수준 지수는 168.5/)).toBeVisible();
     await expect(page.getByText(/한국보다 68.5포인트 높습니다/)).toBeVisible();
   });
 
   test("차트와 순위표가 표시된다", async ({ page }) => {
     await page.goto("/dashboard");
 
-    await expect(page.getByText("물가 수준 지수 비교")).toBeVisible();
+    await expect(page.getByText("GDP 기준 일반 가격수준 비교")).toBeVisible();
     await expect(page.locator(".recharts-wrapper")).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByText("국가별 순위")).toBeVisible();
+    await expect(page.getByText("국가별 비교")).toBeVisible();
+    await expect(page.getByText(/근소한 값 차이는 엄격한 국가 순위를 의미하지 않습니다/)).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "표시 순서" })).toBeVisible();
     await expect(page.getByRole("columnheader", { name: "2026 소비자물가지수(CPI) 전망" })).toBeVisible();
     await expect(page.getByRole("columnheader", { name: "소비자물가지수(CPI) 전년동월비" })).toBeVisible();
 

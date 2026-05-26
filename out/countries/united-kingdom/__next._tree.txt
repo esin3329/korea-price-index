@@ -1,0 +1,3 @@
+:HL["/_next/static/chunks/16k~t836az_ux.css","style"]
+:HL["/_next/static/chunks/0kh8.lcl.vwo-.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"countries","param":null,"prefetchHints":0,"slots":{"children":{"name":"slug","param":{"type":"d","key":"united-kingdom","siblings":null},"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"qUdCY6aRFEMdUtOlDIWkf"}

@@ -93,8 +93,8 @@ const CHART_MODES: Array<{
   {
     id: "priceLevel",
     label: "가격수준",
-    title: "물가 수준 지수 비교",
-    description: "World Bank WDI 가격수준 비율을 한국 기준 100으로 재산정했습니다.",
+    title: "GDP 기준 일반 가격수준 비교",
+    description: "World Bank WDI의 GDP 기준 가격수준 비율을 한국 기준 100으로 재산정했습니다.",
   },
   {
     id: "latestCpi",
@@ -312,7 +312,9 @@ export default function DashboardClient() {
       : null;
   const shouldShowQualityNotice =
     refreshMetadata?.hasIncompleteOfficialPull === true ||
-    refreshMetadata?.isFallback === true;
+    refreshMetadata?.isFallback === true ||
+    refreshMetadata?.consumerInflationIsFallback === true ||
+    refreshMetadata?.latestCpiInflationIsFallback === true;
   const missingCountries = refreshMetadata?.missingCountries || [];
   const avgConsumerInflation =
     data.length > 0
@@ -354,7 +356,7 @@ export default function DashboardClient() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "k-collusion-index.csv";
+    link.download = "korea-price-index.csv";
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -374,11 +376,11 @@ export default function DashboardClient() {
           <p className={styles.eyebrow}>Korea baseline: 100</p>
           <h2 className={styles.title}>Korea Price Index</h2>
           <p className={styles.description}>
-            World Bank WDI의 PPP 기반 물가수준 비율을 사용해 G20 주요 국가의
-            상대적인 가격 수준을 비교합니다. 대한민국을 100으로 다시 기준화했기
-            때문에 숫자가 높을수록 한국보다 전반적인 물가 수준이 높다는 뜻입니다.
+            World Bank WDI의 GDP 기준 가격수준 비율을 사용해 G20 회원 중 19개
+            국가의 상대적인 일반 가격수준을 비교합니다. 대한민국을 100으로 다시
+            기준화했으며, 소비자 생활비나 체감물가를 직접 측정하는 지표는 아닙니다.
           </p>
-          <p className={styles.kicker}>한국 기준 글로벌 가격수준 비교 대시보드</p>
+          <p className={styles.kicker}>G20 19개 국가 비교 · EU·AU 지역기구 제외</p>
         </div>
         <div className={styles.refreshStatus}>
           <span className={styles.statusBadge}>공식 데이터</span>
@@ -412,7 +414,11 @@ export default function DashboardClient() {
                       ? ` (${missingCountries.join(", ")})`
                       : ""
                   }`
-                : "World Bank API 대신 최신 WDI 스냅샷 사용"}
+                : refreshMetadata?.isFallback
+                  ? "World Bank API 대신 최신 WDI 스냅샷 사용"
+                  : refreshMetadata?.latestCpiInflationIsFallback
+                    ? "OECD CPI는 공통 월 스냅샷 사용"
+                    : "IMF CPI 전망은 확인된 스냅샷 사용"}
             </p>
           )}
         </div>
@@ -423,9 +429,9 @@ export default function DashboardClient() {
           label="기준 국가"
           value={`${koreaData?.countryName || "대한민국"} 100`}
         />
-        <MetricCard label="평균 지수" value={avgIndex.toFixed(1)} />
+        <MetricCard label="19개국 단순평균" value={avgIndex.toFixed(1)} />
         <MetricCard
-          label="가장 높은 물가 수준"
+          label="가장 높은 GDP 가격수준"
           value={
             highestCountry
               ? `${highestCountry.countryName} ${highestCountry.indexValue.toFixed(1)}`
@@ -433,7 +439,7 @@ export default function DashboardClient() {
           }
         />
         <MetricCard
-          label="가장 낮은 물가 수준"
+          label="가장 낮은 GDP 가격수준"
           value={
             lowestCountry
               ? `${lowestCountry.countryName} ${lowestCountry.indexValue.toFixed(1)}`
@@ -458,7 +464,7 @@ export default function DashboardClient() {
         <div className={styles.insightGrid}>
           <InsightCard
             tone="warn"
-            label="가격수준 상위"
+            label="GDP 가격수준 비교"
             title={`${highestCountry?.countryName || "-"} ${highestCountry?.indexValue.toFixed(1) || "-"}`}
             description={`한국보다 가격수준이 높은 국가는 ${aboveKoreaCount}개, 낮은 국가는 ${belowKoreaCount}개입니다.`}
           />
@@ -483,11 +489,12 @@ export default function DashboardClient() {
 
       <section className={styles.contextGrid} aria-label="지표 해석">
         <div className={styles.contextPanel}>
-          <h3>가격수준 지수</h3>
+          <h3>GDP 기준 일반 가격수준 지수</h3>
           <p>
-            가격수준 지수는 국가 간 가격 수준을 비교하기 위한 지표입니다. World
-            Bank WDI의 PPP 기반 가격수준 비율을 한국=100으로 재산정해, 숫자가
-            높을수록 한국보다 전반적인 가격 수준이 높다는 뜻입니다.
+            GDP 기준 일반 가격수준 지수는 국가 경제 전체의 상대적 가격수준을 비교하기
+            위한 지표입니다. World Bank WDI의 PPP 기반 GDP 가격수준 비율을
+            한국=100으로 재산정하며, 소비자 장바구니나 생활비를 직접 비교하지
+            않습니다.
           </p>
         </div>
         <div className={styles.contextPanel}>
@@ -495,7 +502,7 @@ export default function DashboardClient() {
           <p>
             소비자물가지수(CPI)는 물가 상승 속도를 보여주는 보조 지표입니다.
             IMF 전망은 향후 연간 물가 흐름, OECD 전년동월비는 최근 월별 상승률을
-            설명하며 가격수준 순위 계산에는 사용하지 않습니다.
+            설명하며 GDP 가격수준 비교값 계산에는 사용하지 않습니다.
           </p>
         </div>
       </section>
@@ -525,8 +532,11 @@ export default function DashboardClient() {
 
       <section className={styles.panel}>
         <div className={styles.sectionHeader}>
-          <h3>국가별 순위</h3>
-          <p>한국 기준선과의 차이를 함께 확인합니다.</p>
+          <h3>국가별 비교</h3>
+          <p>
+            한국 기준선과의 차이를 함께 확인합니다. 근소한 값 차이는 엄격한 국가
+            순위를 의미하지 않습니다.
+          </p>
         </div>
         <RankingTable data={priceLevelChartData} onSelectCountry={setSelectedCountryCode} />
       </section>
@@ -537,7 +547,7 @@ export default function DashboardClient() {
             <p className={styles.eyebrow}>Country detail</p>
             <h3>{selectedCountry.countryName} 상세 해석</h3>
             <p>
-              {selectedCountry.countryName}의 가격수준 지수는{" "}
+              {selectedCountry.countryName}의 GDP 기준 일반 가격수준 지수는{" "}
               {selectedCountry.indexValue.toFixed(1)}로,{" "}
               {formatSigned(selectedCountry.indexValue - 100)}.
             </p>

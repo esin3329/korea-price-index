@@ -3,6 +3,7 @@ import styles from "@/app/site.module.css";
 
 const navItems = [
   { href: "/dashboard", label: "대시보드" },
+  { href: "/countries", label: "국가별 해설" },
   { href: "/about", label: "Korea Price Index 소개" },
   { href: "/methodology", label: "방법론" },
   { href: "/privacy", label: "개인정보 처리방침" },
